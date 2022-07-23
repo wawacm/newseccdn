@@ -1,12 +1,4 @@
-/* 
 
-<!-- 
-// 项目：秋叶引导页 www.yy.wiki
-// 作者：yedou（QQ 24982360）
-// 时间：2020年12月16日19:36:07
-//
- -->
- */
 
 
 .row{max-width:75rem;margin-right:auto;margin-left:auto}
@@ -1051,12 +1043,3 @@ html:not(.is-mac)::-webkit-scrollbar-thumb, html:not(.is-mac) ::-webkit-scrollba
     background: rgba(32,160,255,.3);
     background: var(--primary_opacity_3);
 }
-/* 
-
-<!-- 
-// 项目：秋叶引导页 www.yy.wiki
-// 作者：yedou（QQ 24982360）
-// 时间：2020年12月16日19:36:07
-//
- -->
- */
