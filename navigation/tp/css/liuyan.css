@@ -1,0 +1,381 @@
+/* 清除浏览器默认样式 */
+* {
+	margin: 0;
+	padding: 0;
+	font-size: 16px;
+	list-style: none;
+	text-decoration: none;
+	box-sizing: border-box;
+	-webkit-tap-highlight-color: transparent;
+}
+/* 留言区 */
+.container {
+    margin: 50px auto;
+    max-width: 1200px;
+    background-color: #EBECF0;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+.container h2{
+    font-size: 20px;
+    text-align: center;
+    margin: 20px 0;
+}
+.form-group {
+    margin-bottom: 20px;
+}
+.form-group label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+.form-group input,
+.form-group textarea,
+.form-group select {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border: none;
+    border-radius: 5px;
+    box-sizing: border-box;
+    font-size: 16px;
+    line-height: 1.5;
+    background-color: #EBECF0;
+    box-shadow: inset 0.2rem 0.2rem 0.6rem #c8d0e7, inset -0.2rem -0.2rem 0.5rem #fff;
+}
+.form-group textarea {
+    height: 150px;
+}
+.submit-btn {
+    display: block;
+    width: 100%;
+    height: 40px;
+    margin-bottom: 10px;
+    color: #000000;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    line-height: 1.5;
+    transition: background-color 0.3s ease;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+.submit-btn:hover {
+	color: #fff;
+    background-color: #3e8e41;
+}
+
+/* 手机端样式 */
+@media screen and (max-width: 480px) {
+    .container {
+        margin: 20px;
+        padding: 10px;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 14px;
+    }
+    .submit-btn {
+        height: 30px;
+        font-size: 14px;
+    }
+}
+
+/* 平板端样式 */
+@media screen and (min-width: 481px) and (max-width: 1024px) {
+    .container {
+        margin: 50px auto;
+        max-width: 600px;
+    }
+    .form-group input,
+    .form-group textarea,
+    .form-group select {
+        font-size: 16px;
+    }
+    .submit-btn {
+        height: 40px;
+        font-size: 16px;
+    }
+}
+/* 顶部导航栏区块 */
+.header {
+	z-index: 99999;
+	position: sticky;
+	top: 0;
+	height: 80px;
+	background-color: rgb(255, 255, 255, 1);
+	box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.top {
+	margin: 0 auto;
+	max-width: 1200px;
+	height: 80px;
+	display: flex;
+	align-self: center;
+}
+
+.logo {
+	width: 20%;
+	height: 80px;
+	display: flex;
+	/* logo垂直居中 */
+	align-items: center;
+}
+
+.logo img {
+	width: 100%;
+}
+
+.top-list {
+	width: 80%;
+	align-self: center;
+}
+
+.top-list ul {
+	display: flex;
+	justify-content: space-around;
+}
+
+.top-list ul li {
+	height: 80px;
+	font-size: 16px;
+}
+
+.top-list ul li a {
+	/* color: #969CA9; */
+	display: block;
+	height: 80px;
+	display: flex;
+	align-items: center;
+}
+
+.top-list li a:hover {
+	color: red;
+}
+/* 底部 */
+.foot {
+	margin: auto;
+	padding: 20px;
+	max-width: 1200px;
+	display: flex;
+	justify-content: center;
+	box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.footer {
+	width: 100%;
+	padding: 10px;
+	display: flex;
+	justify-content: center;
+	justify-content: space-between;
+	box-shadow: inset 0.2rem 0.2rem 0.6rem #c8d0e7, inset -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.left {
+	width: 50%;
+	padding:10px 20px;
+}
+
+.leftimg {
+	margin-bottom: 10px;
+	width: 80%;
+	/* height: 40px; */
+	text-align: center;
+}
+
+.leftimg img {
+	width: 100%;
+	height: 100%;
+}
+
+.left a {
+	color: #969CA9;
+}
+
+.center {
+	width: 100%;
+	padding: 10px 20px;
+}
+
+.biaoqian ul {
+	display: flex;
+	flex-wrap: wrap;
+}
+.biaoqian ul li{
+	width: 33.3333%;
+	padding: 5px;
+}
+.biaoqian a {
+	overflow: hidden;
+	text-align: center;
+	display: block;
+	height: 50px;
+	line-height: 50px;
+	border-radius: 5px;
+}
+
+#a1 {
+	background-color: #73bbf7;
+}
+
+#a2 {
+	background-color: #e100ff;
+}
+
+#a3 {
+	background-color: #ff67c0;
+}
+
+.tb {
+	margin-top: 10px;
+}
+
+.tb svg {
+	width: 30px;
+	height: 30px;
+	padding: 5px;
+	border-radius: 50%;
+	background-color: #dfdcdc;
+}
+
+.banquan a {
+	color: #969CA9;
+}
+
+.right {
+	width: 50%;
+	padding: 10px 10px;
+}
+
+.right ul {
+	display: flex;
+	justify-content: center;
+}
+
+.right ul li {
+	margin: 0 15px;
+	text-align: center;
+}
+
+.right ul li a {
+	display: block;
+	color: #969CA9;
+}
+
+.right ul li img {
+	width: 70px;
+}
+
+.parallax>use {
+	animation: move-forever 12s linear infinite;
+}
+.tongji{
+	margin:20px auto;
+	padding:20px 10px;
+	max-width: 1200px;
+	box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+.tongjinr{
+	width: 100%;
+	padding: 20px 10px;
+	box-shadow: inset 0.2rem 0.2rem 0.6rem #c8d0e7, inset -0.2rem -0.2rem 0.5rem #fff;
+}
+/* 底部波浪 */
+.parallax>use:nth-child(1) {
+	animation-delay: -2s;
+}
+
+.parallax>use:nth-child(2) {
+	animation-delay: -2s;
+	animation-duration: 5s;
+}
+
+.parallax>use:nth-child(3) {
+	animation-delay: -4s;
+	animation-duration: 3s;
+}
+
+
+
+@keyframes move-forever {
+	0% {
+		transform: translate(-90px, 0%);
+	}
+
+	100% {
+		transform: translate(85px, 0%);
+	}
+}
+
+.wiiuii_layout {
+	width: 100%;
+	height: 40px;
+	position: relative;
+	overflow: hidden;
+	z-index: 1;
+	background: var(--footer-bg);
+}
+
+.editorial {
+	display: block;
+	width: 100%;
+	height: 40px;
+}
+
+/* 媒体查询 自适应 */  
+    @media screen and (max-width:600px) {
+        .top-list {
+            display: none;
+        }
+    
+        .header {
+            height:60px;
+        }
+    
+        .top {
+            margin: 0 auto;
+            height: 60px;
+            display: flex;
+            align-self: center;
+        }
+    
+        .logo {
+            width: 100%;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            /* logo垂直居中 */
+            align-items: center;
+        }
+    
+        .logo img {
+            width: auto;
+            height: 40px;
+        }
+    
+        .footer{
+            padding: 0 10px;
+        }
+    
+        .left {
+            display: none;
+        }
+    
+        .right {
+            display: none;
+        }  
+    }
+    
+    
+/*底部二维码*/
+.right ul li img{
+    display: inline-block;
+    margin-top: 35px;
+    transition: transform 0.5s ease-in-out; /* 添加过渡效果 */
+}
+.right ul li:hover img {
+    transform: scale(2); /* 图片放大 */
+}

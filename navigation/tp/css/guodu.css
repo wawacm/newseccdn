@@ -1,0 +1,536 @@
+/* 清除浏览器默认样式 */
+* {
+    margin: 0;
+    padding: 0;
+    font-size: 16px;
+    list-style: none;
+    text-decoration: none;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* 过渡页区 */
+.zhandianbox {
+    margin: auto;
+    max-width: 1200px;
+    padding: 30px 0;
+}
+
+.zhandianbt {
+    width: 100%;
+    padding: 20px;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.zhandianbt h2 {
+    text-align: center;
+    padding: 20px 10px;
+    margin-bottom: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    /* 显示省略号 */
+    text-overflow: ellipsis;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.zdbox {
+    display: flex;
+}
+
+.zhandianlogo {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: inset 0.2rem 0.2rem 0.6rem #c8d0e7, inset -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.zhandianlogo img {
+    width: 50%;
+    height: 50%;
+    border-radius: 50%;
+}
+
+.zhandianyc {
+    margin: 5px 0 10px 15px;
+    /* height: 200px; */
+}
+
+.zhandianyc p {
+    margin: 10px 0;
+}
+
+.zhandianyc p:nth-child(5) {
+    margin-top: 20px;
+}
+
+.zhandianyc p:nth-child(5) a {
+    padding: 10px;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #c8d0e7;
+}
+
+.zhandianyc p:nth-child(5) a:hover {
+    color: #fff;
+    background-color: #0889f3;
+}
+
+/* 站点介绍 */
+.zdjsbox {
+    margin: auto;
+    max-width: 1200px;
+    padding: 30px 0;
+}
+
+.zdjs {
+    width: 100%;
+    padding: 20px;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.zdjs h2 {
+    text-align: center;
+    padding: 20px 10px;
+    margin-bottom: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    /* 显示省略号 */
+    text-overflow: ellipsis;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.zdjsms {
+    width: 100%;
+    padding: 10px;
+    box-shadow: inset 0.2rem 0.2rem 0.6rem #c8d0e7, inset -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.xgzdbox {
+    margin: auto;
+    max-width: 1200px;
+}
+
+.xgzd {
+    width: 100%;
+    padding: 20px;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+#xgzd {
+    text-align: center;
+    padding: 20px 10px;
+    margin-bottom: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    /* 显示省略号 */
+    text-overflow: ellipsis;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.tabcontent {
+    margin: auto;
+    width: 100%;
+}
+
+.tabcontent ul {
+    padding: 1%;
+    display: flex;
+    flex-wrap: wrap;
+    box-shadow: inset 0.2rem 0.2rem 0.6rem #c8d0e7, inset -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.tabcontent ul li {
+    padding: 15px;
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+
+.tabcontent ul li a:hover {
+    background-color: #ADD8E6;
+}
+
+.tabcontent ul li a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+/* 站点图标 */
+.tabcontentimg {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    width: 30%;
+    /* 溢出隐藏 */
+    overflow: hidden;
+    /* 不伸缩 */
+    flex-grow: 0;
+    /* 不伸缩 */
+    flex-shrink: 0;
+}
+
+.tabcontentimg img {
+    width: 100%;
+}
+
+.tabcontentms {
+    width: 70%;
+    padding: 10px 5px;
+}
+
+.tabcontentms h2 {
+    font-weight: 900;
+    white-space: nowrap;
+    overflow: hidden;
+    /* 显示省略号 */
+    text-overflow: ellipsis;
+}
+
+.tabcontentms p {
+    color: #969CA9;
+    overflow: hidden;
+    /* 显示省略号 */
+    text-overflow: ellipsis;
+    /* 显示两行 */
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+}
+
+@media (max-width: 1000px) {
+    .tabcontent ul li {
+        -ms-flex: 0 0 33.333333%;
+        flex: 0 0 33.333333%;
+        max-width: 33.333333%;
+    }
+}
+
+@media screen and (max-width:700px) {
+    .zdbox {
+        display: block;
+    }
+
+    .zhandianlogo {
+        width: 100%;
+        height: 130px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background-image: url('https://www.a754.com/wp-content/uploads/2023/04/ee62e01846000753.webp');
+        background-size: 100%;
+        background-position: center;
+        background-repeat: no-repeat;
+    }
+
+    .zhandianlogo img {
+        width: 80px;
+        height: 80px;
+        background-color: #EBECF0;
+        position: relative;
+        bottom: -70px;
+        box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+    }
+
+    .zhandianyc {
+        margin: 50px 0 10px 15px;
+    }
+}
+
+@media screen and (max-width:600px) {
+    .tabcontent ul li {
+        -ms-flex: 0 0 50%;
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+
+    .tabcontentms p {
+        -webkit-line-clamp: 1;
+    }
+}
+
+/* 顶部导航栏区块 */
+.header {
+    z-index: 99999;
+    position: sticky;
+    top: 0;
+    height: 80px;
+    background-color: rgb(255, 255, 255, 1);
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.top {
+    margin: 0 auto;
+    max-width: 1200px;
+    height: 80px;
+    display: flex;
+    align-self: center;
+}
+
+.logo {
+    width: 20%;
+    height: 80px;
+    display: flex;
+    /* logo垂直居中 */
+    align-items: center;
+}
+
+.logo img {
+    width: 100%;
+}
+
+.top-list {
+    width: 80%;
+    align-self: center;
+}
+
+.top-list ul {
+    display: flex;
+    justify-content: space-around;
+}
+
+.top-list ul li {
+    height: 80px;
+    font-size: 16px;
+}
+
+.top-list ul li a {
+    /* color: #969CA9; */
+    display: block;
+    height: 80px;
+    display: flex;
+    align-items: center;
+}
+
+.top-list li a:hover {
+    color: red;
+}
+
+/* 底部 */
+.foot {
+    margin: auto;
+    padding: 20px;
+    max-width: 1200px;
+    display: flex;
+    justify-content: center;
+    box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.footer {
+    width: 100%;
+    padding: 10px;
+    display: flex;
+    justify-content: center;
+    justify-content: space-between;
+    box-shadow: inset 0.2rem 0.2rem 0.6rem #c8d0e7, inset -0.2rem -0.2rem 0.5rem #fff;
+}
+
+.left {
+    width: 50%;
+    padding: 10px 20px;
+}
+
+.leftimg {
+    margin-bottom: 10px;
+    width: 80%;
+    /* height: 40px; */
+    text-align: center;
+}
+
+.leftimg img {
+    width: 100%;
+    height: 100%;
+}
+
+.left a {
+    color: #969CA9;
+}
+
+.center {
+    width: 100%;
+    padding: 10px 20px;
+}
+
+.biaoqian ul {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.biaoqian ul li {
+    width: 33.3333%;
+    padding: 5px;
+}
+
+.biaoqian a {
+    overflow: hidden;
+    text-align: center;
+    display: block;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 5px;
+}
+
+#a1 {
+    background-color: #73bbf7;
+}
+
+#a2 {
+    background-color: #e100ff;
+}
+
+#a3 {
+    background-color: #ff67c0;
+}
+
+.tb {
+    margin-top: 10px;
+}
+
+.tb svg {
+    width: 30px;
+    height: 30px;
+    padding: 5px;
+    border-radius: 50%;
+    background-color: #dfdcdc;
+}
+
+.banquan a {
+    color: #969CA9;
+}
+
+.right {
+    width: 50%;
+    padding: 10px 10px;
+}
+
+.right ul {
+    display: flex;
+    justify-content: center;
+}
+
+.right ul li {
+    margin: 0 15px;
+    text-align: center;
+}
+
+.right ul li a {
+    display: block;
+    color: #969CA9;
+}
+
+.right ul li img {
+    width: 70px;
+}
+.tongji{
+	margin:20px auto;
+	padding:20px 10px;
+	max-width: 1200px;
+	box-shadow: 0.3rem 0.3rem 0.6rem #c8d0e7, -0.2rem -0.2rem 0.5rem #fff;
+}
+.tongjinr{
+	width: 100%;
+	padding: 20px 10px;
+	box-shadow: inset 0.2rem 0.2rem 0.6rem #c8d0e7, inset -0.2rem -0.2rem 0.5rem #fff;
+}
+/* 底部波浪 */
+.parallax>use {
+    animation: move-forever 12s linear infinite;
+}
+
+.parallax>use:nth-child(1) {
+    animation-delay: -2s;
+}
+
+.parallax>use:nth-child(2) {
+    animation-delay: -2s;
+    animation-duration: 5s;
+}
+
+.parallax>use:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 3s;
+}
+
+
+
+@keyframes move-forever {
+    0% {
+        transform: translate(-90px, 0%);
+    }
+
+    100% {
+        transform: translate(85px, 0%);
+    }
+}
+
+.wiiuii_layout {
+    width: 100%;
+    height: 40px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    background: var(--footer-bg);
+}
+
+.editorial {
+    display: block;
+    width: 100%;
+    height: 40px;
+}
+
+/* 媒体查询 自适应 */
+@media screen and (max-width:600px) {
+    .top-list {
+        display: none;
+    }
+
+    .header {
+        height: 60px;
+    }
+
+    .top {
+        margin: 0 auto;
+        height: 60px;
+        display: flex;
+        align-self: center;
+    }
+
+    .logo {
+        width: 100%;
+        height: 60px;
+        display: flex;
+        justify-content: center;
+        /* logo垂直居中 */
+        align-items: center;
+    }
+
+    .logo img {
+        width: auto;
+        height: 40px;
+    }
+
+    .footer {
+        padding: 0 10px;
+    }
+
+    .left {
+        display: none;
+    }
+
+    .right {
+        display: none;
+    }
+}
+
+/*底部二维码*/
+.right ul li img{
+    display: inline-block;
+    margin-top: 35px;
+    transition: transform 0.5s ease-in-out; /* 添加过渡效果 */
+}
+.right ul li:hover img {
+    transform: scale(2); /* 图片放大 */
+}

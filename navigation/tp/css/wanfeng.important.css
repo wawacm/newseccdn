@@ -1,0 +1,335 @@
+:root {
+    --text: #000;
+    --sd: #22222230;
+    --s3d: #99999947;
+    --card: #efefef55;
+    --night-card: #00000030;
+    --filters: blur(5px) saturate(1.3);
+    --radius:5px;
+    --max-width:1200px;
+    --border1:1px solid #ffffff26;
+    --border2:1px solid #7f7f7f55;
+} 
+html, body {
+    background: url(https://www.dmoe.cc/random.php) !important;
+    background-repeat: no-repeat!important;
+    background-size: cover!important; 
+    background-position: center center!important;
+    background-attachment: fixed!important;
+}
+::-webkit-scrollbar-thumb {
+    background: #7f7f7f70 !important;
+    background-clip: padding-box !important;
+    border-radius: 10px !important;
+    box-shadow: none !important;
+}
+::-webkit-scrollbar-track {
+    box-shadow: none !important;
+}
+/*<!-- 顶部导航栏 -->*/
+.header {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    /*box-shadow: none !important; */
+    backdrop-filter: var(--filters)!important;
+}
+/*<!-- 分类内容 -->*/
+.fl {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    backdrop-filter: var(--filters)!important;
+}
+.fl ul li a {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+}
+/*<!-- 搜索引擎区块 -->*/
+.search-container {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+    backdrop-filter: var(--filters)!important;
+    max-width: var(--max-width)!important;
+}
+.search-container {
+    width: 100%;
+    border-radius: 0px;
+}
+#search-tabs {
+     width: 100%!important; 
+     margin: 20px 0 !important;
+}
+#search-input {
+    box-shadow: none !important;
+}
+.sstab {
+    border: 2px solid lightblue!important;
+    /*background-color: var(--card)!important;*/
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+}
+/*<!-- 广告位 -->*/
+.glyg {
+    max-width: var(--max-width)!important;
+}
+.pmd {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+    backdrop-filter: var(--filters)!important;
+}
+.pmd {
+    width: 100%;
+    border-radius: 0px;
+}
+.ggw0 {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: 5px !important;
+    backdrop-filter: var(--filters)!important;
+}
+.gg-list li a {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+}
+/*<!-- 横幅广告 -->*/
+.ggw1 {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+    backdrop-filter: var(--filters)!important;
+    max-width: var(--max-width)!important;
+}
+/*<!-- main -->*/
+.main {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+    backdrop-filter: var(--filters)!important;
+    max-width: var(--max-width)!important;
+}
+.cebianlan {
+    box-shadow: none !important;
+}
+.cebianlan ul li {
+    height: 45px!important;
+    line-height: 45px!important;
+}
+.cebianlan ul li a {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+    height: 45px!important;
+}
+.main-list {
+    box-shadow: none !important;
+}
+.biaoti {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    /*box-shadow: none !important;*/
+    border-radius: var(--radius) !important;
+}
+.tab {
+    box-shadow: none !important;
+}
+.tablinks {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    /*box-shadow: none !important;*/
+}
+/*.tabcontent ul li {*/
+/*    height: 90px;*/
+/*}*/
+.tabcontent ul li a {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+}
+.tabcontentms p {
+    color: #626a7b !important;
+}
+/*<!-- 文章区块 -->*/
+.wenzhang {
+    backdrop-filter: var(--filters);
+    max-width: var(--max-width)!important;
+}
+.wenzhangnr {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+}
+.wzbt {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius)!important;
+}
+.wz-list {
+    padding: 0px!important; 
+    box-shadow: none !important;
+}
+.wzk {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+}
+.yqlj {
+    box-shadow: none !important;
+    background-color: var(--card)!important;
+    border-radius: var(--radius) !important;
+    margin: 20px 0 !important;
+}
+.yqlj ul li a {
+    /*color:var(--text)!important;*/
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+}
+/*<!-- 底部 -->*/
+.foot {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    border-radius: var(--radius) !important;
+    backdrop-filter: var(--filters)!important;
+    max-width: var(--max-width)!important;
+    
+}
+.footer {
+    box-shadow: none !important;
+}
+.left a {
+    color:var(--text);
+}
+.banquan a {
+    color:var(--text);
+}
+.right ul li a {
+    color:var(--text);
+}
+
+/* 移动端侧边栏 */
+.cblzc {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+    backdrop-filter: var(--filters)!important;
+}
+.cblfl {
+    box-shadow: none !important;
+}
+.cblfl ul li {
+    background-color: var(--card)!important;
+    box-shadow: 0 1.5px 2px var(--s3d), 0px 1px 6px var(--sd) !important;
+}
+
+/*边框*/
+/*.sstab,*/
+.header,
+/*.cblfl,*/
+.cblzc,
+.cblfl ul li,
+.search-container,
+.fl,
+.fl ul li a,
+.cebianlan,
+.cebianlan ul li a,
+.pmd,
+.ggw0,
+.gg-list li a,
+.ggw1,
+.main,
+.main-list,
+.biaoti,
+/*.tab,*/
+.tablinks,
+.tabcontent ul li a,
+.wenzhangnr,
+.wzbt,
+.wzlm,
+.wzlm ul li a,
+/*.wz-list,*/
+.wzk,
+/*::-webkit-scrollbar-thumb,*/
+/*::-webkit-scrollbar-track,*/
+.foot,
+/*.footer,*/
+.tongji,
+.tongjinr,
+.yqlj,
+.yqlj ul li a{
+    /*box-shadow: none;*/
+    border: var(--border1)!important;
+}
+/*夜间模式*/
+/*.night .sstab,*/
+.night .header,
+.night .cblfl,
+.night .cblzc,
+.night .cblfl ul li,
+.night .search-container,
+.night .fl,
+.night .fl ul li a,
+.night .cebianlan,
+.night .cebianlan ul li a,
+.night .pmd,
+.night .ggw0,
+.night .gg-list li a,
+.night .ggw1,
+.night .main,
+.night .main-list,
+.night .biaoti,
+.night .tab,
+.night .tablinks,
+.night .tabcontent ul li a,
+.night .wenzhangnr,
+.night .wzbt,
+.night .wzlm,
+.night .wzlm ul li a,
+.night .wz-list,
+.night .wzk,
+.night ::-webkit-scrollbar-thumb,
+.night ::-webkit-scrollbar-track,
+.night .foot,
+.night .footer,
+.night .tongji,
+.night .tongjinr,
+.night .yqlj,
+.night .yqlj ul li a{
+    box-shadow: none;
+    border: var(--border2)!important;
+}
+/*边框*/
+.night .cblfl,
+.night .tab,
+.night .wz-list,
+.night ::-webkit-scrollbar-thumb,
+.night ::-webkit-scrollbar-track,
+.night .footer{
+    border: none!important;
+}
+.night .header,
+.night .fl,
+.night .fl ul li a ,
+.night .search-container ,
+.night .pmd,
+.night .ggw0,
+.night .gg-list li a,
+.night .ggw1,
+.night .main,
+.night .cebianlan ul li a,
+.night .biaoti,
+.night .tablinks,
+.night .tabcontent ul li a,
+.night .wenzhangnr,
+.night .wzbt,
+.night .wzk,
+.night .yqlj,
+.night .yqlj ul li a,
+.night .foot,
+.night .cblzc,
+.night .cblfl ul li{
+    background-color: var(--night-card)!important;
+}
+.night h3, .night a, .night button, .night .tongjinr,.night p{
+    color: white!important;
+}
