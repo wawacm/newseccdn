@@ -98,7 +98,7 @@ async function start(){
         console.warn(err)
         document.getElementById('do').innerText='开始';
         document.getElementById('do').disabled=false;
-        alert("该链接不可用，如果你能够正常访问该链接，那么很有可能是浏览器的跨域限制")
+        alert("该节点出现异常，有可能是您请求过快导致的，请您更换节点亦或者刷新网站！")
         return
     }
     document.getElementById('describe').innerText='实时速度';
