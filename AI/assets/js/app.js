@@ -2290,23 +2290,25 @@ class GeminiChatApp {
             const ext = name.split('.').pop().toLowerCase();
             const isImage = (file.type && file.type.startsWith('image/')) || ['jpg','jpeg','png','gif','webp','heic','heif'].includes(ext);
             if (!isImage || file.size <= TWO_MB) {
-            return file;
-        }
+                return file;
+            }
 
             // HEIC/HEIF 转换
             if ((file.type && (file.type.includes('heic') || file.type.includes('heif'))) || ext === 'heic' || ext === 'heif') {
                 if (window.heic2any) {
                     try {
-                        const converted = await window.heic2any({ blob: file, toType: 'image/jpeg', quality: 0.7 });
+                        const converted = await window.heic2any({ blob: file, toType: 'image/jpeg', quality: 0.8 });
                         const jpegBlob = Array.isArray(converted) ? converted[0] : converted;
                         return new File([jpegBlob], name.replace(/\.[^\.]+$/, '.jpg'), { type: 'image/jpeg' });
                     } catch (e) {
+                        console.warn('HEIC转换失败，使用原文件', e);
                     }
                 } else {
+                    console.warn('HEIC转换库未加载，使用原文件');
                 }
             }
 
-            // 使用 Canvas 压缩为 JPEG 质量70%
+            // 使用 Canvas 智能压缩
             const dataUrl = await new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = () => resolve(reader.result);
@@ -2322,29 +2324,79 @@ class GeminiChatApp {
             });
 
             const canvas = document.createElement('canvas');
-            const w = img.naturalWidth || img.width;
-            const h = img.naturalHeight || img.height;
-            canvas.width = w;
-            canvas.height = h;
             const ctx = canvas.getContext('2d');
+            
+            // 获取原始尺寸
+            let w = img.naturalWidth || img.width;
+            let h = img.naturalHeight || img.height;
+            
+            // 计算压缩比例 - 根据文件大小智能调整
+            let scale = 1;
+            const fileSizeMB = file.size / (1024 * 1024);
+            
+            if (fileSizeMB > 8) {
+                scale = 0.5; // 8MB以上，压缩到50%
+            } else if (fileSizeMB > 5) {
+                scale = 0.6; // 5-8MB，压缩到60%
+            } else if (fileSizeMB > 3) {
+                scale = 0.7; // 3-5MB，压缩到70%
+            } else {
+                scale = 0.8; // 2-3MB，压缩到80%
+            }
+            
+            // 应用压缩比例
+            const newW = Math.floor(w * scale);
+            const newH = Math.floor(h * scale);
+            
+            canvas.width = newW;
+            canvas.height = newH;
 
             // PNG 可能有透明，先铺白底避免黑底
             const isPng = (file.type === 'image/png') || ext === 'png';
             if (isPng) {
                 ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, w, h);
+                ctx.fillRect(0, 0, newW, newH);
             }
 
-            ctx.drawImage(img, 0, 0, w, h);
+            // 绘制压缩后的图片
+            ctx.drawImage(img, 0, 0, newW, newH);
 
-            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.7));
+            // 根据文件大小调整JPEG质量
+            let quality = 0.8;
+            if (fileSizeMB > 8) {
+                quality = 0.6; // 大文件用更低质量
+            } else if (fileSizeMB > 5) {
+                quality = 0.7;
+            }
+
+            const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', quality));
             if (!blob) {
+                return file;
+            }
+
+            // 检查压缩效果，如果压缩后文件更大，返回原文件
+            if (blob.size >= file.size) {
+                console.info('压缩后文件更大，使用原文件', { 
+                    originalBytes: file.size, 
+                    compressedBytes: blob.size,
+                    originalName: name 
+                });
                 return file;
             }
 
             const newName = name.replace(/\.[^\.]+$/, '.jpg');
             const newFile = new File([blob], newName, { type: 'image/jpeg' });
-            console.info('压缩完成', { originalBytes: file.size, compressedBytes: newFile.size, originalName: name, newName });
+            console.info('压缩完成', { 
+                originalBytes: file.size, 
+                compressedBytes: newFile.size, 
+                compressionRatio: ((file.size - newFile.size) / file.size * 100).toFixed(1) + '%',
+                originalSize: `${(file.size / (1024 * 1024)).toFixed(2)}MB`,
+                compressedSize: `${(newFile.size / (1024 * 1024)).toFixed(2)}MB`,
+                originalName: name, 
+                newName,
+                scale: `${(scale * 100).toFixed(0)}%`,
+                quality: quality
+            });
             return newFile;
         } catch (err) {
             console.warn('压缩失败，使用原文件', err);
