@@ -1,4 +1,5 @@
 {
-  "version": "2.1",
-  "forceUpdate": true
+  "version": "2.2",
+  "forceUpdate": false
 }
+
