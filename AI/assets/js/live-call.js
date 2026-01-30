@@ -68,7 +68,8 @@ return this.speakerMuted;}
 async switchCamera(){if(this.isSwitchingCamera||!this.isActive||this.mode!=='audio-video'){return false;}
 try{this.isSwitchingCamera=true;this.currentFacingMode=this.currentFacingMode==='user'?'environment':'user';if(this.videoTrack){this.videoTrack.stop();}
 if(this.videoInterval){clearInterval(this.videoInterval);this.videoInterval=null;}
-const newStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:this.currentFacingMode,width:{ideal:1280},height:{ideal:720},frameRate:{ideal:30}},audio:false});const newVideoTrack=newStream.getVideoTracks()[0];const audioTrack=this.mediaStream.getAudioTracks()[0];this.mediaStream.getVideoTracks().forEach(t=>t.stop());this.mediaStream=new MediaStream([audioTrack,newVideoTrack]);if(this.videoElement){this.videoElement.srcObject=this.mediaStream;}
+const newStream=await navigator.mediaDevices.getUserMedia({video:{facingMode:this.currentFacingMode,width:{ideal:1280},height:{ideal:720},frameRate:{ideal:60}},audio:false});const newVideoTrack=newStream.getVideoTracks()[0];const audioTrack=this.mediaStream.getAudioTracks()[0];if(this.mediaStream){this.mediaStream.getVideoTracks().forEach(t=>t.stop());}
+this.mediaStream=new MediaStream([audioTrack,newVideoTrack]);const videoEl=this.videoElement||document.getElementById('callVideo');if(videoEl){videoEl.srcObject=this.mediaStream;this.videoElement=videoEl;}
 this.videoTrack=newVideoTrack;this.imageCapture=null;if(typeof ImageCapture!=='undefined'&&this.videoTrack){try{this.imageCapture=new ImageCapture(this.videoTrack);}catch(e){}}
 if(this.isActive){this.startVideoStream();}
 return true;}catch(error){this.onError('摄像头切换失败: '+error.message);return false;}finally{this.isSwitchingCamera=false;}}
