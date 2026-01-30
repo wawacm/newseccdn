@@ -305,7 +305,7 @@ let thinkingHtml='';if(message.role==='assistant'&&message.thinking_content&&mes
                     </div>
                 </div>
             `;}
-const isHtmlContent=message.content.includes('<div class="generated-image">')||message.content.includes('<img src="data:')||message.content.includes('<div class="')||message.content.includes('<img ')||message.content.includes('<p class="')||message.content.includes('<span class="');const messageContent=isHtmlContent?message.content:this.formatMessageText(message.content);let proxyBadge='';if(message.role==='assistant'&&message.is_proxy){proxyBadge='<span class="proxy-badge" title="通过代理服务器响应"><i class="fas fa-server"></i></span>';}
+const contentWithoutCodeBlocks=message.content.replace(/```[\s\S]*?```/g,'');const isHtmlContent=contentWithoutCodeBlocks.includes('<div class="generated-image">')||contentWithoutCodeBlocks.includes('<img src="data:')||contentWithoutCodeBlocks.includes('<div class="')||contentWithoutCodeBlocks.includes('<img ')||contentWithoutCodeBlocks.includes('<p class="')||contentWithoutCodeBlocks.includes('<span class="');const messageContent=isHtmlContent?message.content:this.formatMessageText(message.content);let proxyBadge='';if(message.role==='assistant'&&message.is_proxy){proxyBadge='<span class="proxy-badge" title="通过代理服务器响应"><i class="fas fa-server"></i></span>';}
 const bubbleClass=message.role==='user'?'bubble-user':'bubble-ai';messageDiv.innerHTML=`
             ${avatarHtml}
             <div class="message-bubble ${bubbleClass}">
