@@ -1,10 +1,10 @@
-if(typeof AccessControl==='undefined'){class AccessControl{constructor(){this.isLoggedIn=false;this.anonymousCount=this.loadAnonymousCount();this.anonymousLimit=5;this.isApiDomain=false;this.isPublicDomain=false;this.user=null;}
+if(typeof AccessControl==='undefined'){class AccessControl{constructor(){this.isLoggedIn=false;this.anonymousCount=this.loadAnonymousCount();this.anonymousLimit=5;this.isApiDomain=false;this.isPublicDomain=false;this.user=null;this.modelPolicy=null;}
 loadAnonymousCount(){try{const today=new Date().toDateString();const stored=localStorage.getItem('anonymous_count');if(stored){const data=JSON.parse(stored);if(data.date===today){console.log(`📊 加载今日匿名消息计数: ${data.count}`);return data.count||0;}}
 console.log('📊 新的一天，重置匿名消息计数');this.saveAnonymousCount(0);return 0;}catch(error){console.error('加载匿名计数失败:',error);return 0;}}
 saveAnonymousCount(count){try{const today=new Date().toDateString();localStorage.setItem('anonymous_count',JSON.stringify({date:today,count:count}));console.log(`💾 保存匿名消息计数: ${count}`);}catch(error){console.error('保存匿名计数失败:',error);}}
-async checkAccess(){try{const response=await fetch('/api/auth/check-access');const data=await response.json();if(data.success){this.isLoggedIn=data.isLoggedIn;this.anonymousCount=data.count||0;this.anonymousLimit=data.limit||5;this.isApiDomain=data.isApiDomain||false;this.isPublicDomain=data.isPublicDomain||false;this.user=data.user;if(this.isApiDomain&&!this.isLoggedIn){return{allowed:false,requireLogin:true,message:'此API接口需要登录才能使用'};}
+async checkAccess(){try{const response=await fetch('/api/auth/check-access');const data=await response.json();if(data.success){this.isLoggedIn=data.isLoggedIn;this.anonymousCount=data.count||0;this.anonymousLimit=data.limit||5;this.isApiDomain=data.isApiDomain||false;this.isPublicDomain=data.isPublicDomain||false;this.user=data.user;this.modelPolicy=data.model_policy||null;if(this.isApiDomain&&!this.isLoggedIn){return{allowed:false,requireLogin:true,message:'此API接口需要登录才能使用'};}
 return{allowed:data.allowed,requireLogin:data.requireLogin||false,message:data.message||''};}
-return{allowed:true,requireLogin:false,message:''};}catch(error){console.error('检查访问权限失败:',error);return{allowed:true,requireLogin:false,message:''};}}
+return{allowed:true,requireLogin:false,message:''};}catch(error){console.error('检查访问权限失败:',error);this.modelPolicy=null;return{allowed:true,requireLogin:false,message:''};}}
 showAnonymousStatus(){if(this.isLoggedIn){return '';}
 const remaining=this.anonymousLimit-this.anonymousCount;if(remaining<=0){return '已达到免费限制，请登录继续使用';}
 return `剩余 ${remaining}/${this.anonymousLimit} 条免费消息`;}
