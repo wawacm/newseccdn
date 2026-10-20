@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Cache-Control" "no-transform " />
+    <link rel="alternate" type="application/vnd.wap.xhtml+xml" media="handheld" href="target" />
+    <meta http-equiv="Cache-Control" content="no-transform" />
+    <meta http-equiv="Cache-Control" content="no-siteapp" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="full-screen" content="yes">
+    <meta name="browsermode" content="application">
+    <meta name="x5-fullscreen" content="true">
+    <meta name="x5-page-mode" content="app">
+    <title>弹幕播放器</title>
+    <link rel="stylesheet" href="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/css/yzmplayer.css">
+    <link rel="stylesheet" href="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/css/ad-filter-prompt.css?v=20261013m">
+    <style>html,body{background-color:#000;}#ADtip img{position:absolute;z-index:9999;top:50%;left:50%;border-radius:5px;-webkit-transform:translate(-50%,-50%);-moz-transform:translate(-50%,-50%);transform:translate(-50%,-50%);max-width:80%;max-height:80%;}.yzmplayer-full-icon span svg,.yzmplayer-playlist-icon span svg,.yzmplayer-fulloff-icon span svg{display:none;}.yzmplayer-full-icon span,.yzmplayer-playlist-icon span,.yzmplayer-fulloff-icon span{background-size:contain !important;float:left;width:22px;height:22px;}.yzmplayer-playlist-icon span{background:url(https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/img/playlist.png) center no-repeat;}.yzmplayer-full-icon span{background:url(https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/img/5eca627664041.png) center no-repeat;}.yzmplayer-fulloff-icon span{background:url(https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/img/5eca6278b7137.webp) center no-repeat;}.layui-layer-dialog{text-align:center;font-size:16px;padding-bottom:10px;}.layui-layer-btn.layui-layer-btn-{padding:15px 5px !important;text-align:center;}.layui-layer-btn a{font-size:12px;padding:0 11px !important;}.layui-layer-btn a:hover{border-color:#00a1d6 !important;background-color:#00a1d6 !important;color:#fff !important;}.yzmplayer-controller .yzmplayer-icons .yzmplayer-toggle input+label.checked:after{left:17px;}.yzmplayer-setting-jlast:hover #jumptime,.yzmplayer-setting-jfrist:hover #fristtime{display:block;outline-style:none}#player_pause .tip{color:#f4f4f4;position:absolute;font-size:14px;background-color:hsla(0,0%,0%,0.42);padding:4px 8px;margin:4px;border-radius:3px;right:0;}#player_pause .adimg{color:#f4f4f4;position:absolute;font-size:14px;background-color:hsla(0,0%,0%,0.42);padding:2px 4px;margin:4px;bottom:0px;}#player_pause{position:absolute;z-index:9999;top:50%;left:50%;border-radius:5px;-webkit-transform:translate(-50%,-50%);-moz-transform:translate(-50%,-50%);transform:translate(-50%,-50%);max-width:80%;max-height:80%;}#player_pause img{width:100%;height:100%;}#jumptime::-webkit-input-placeholder,#fristtime::-webkit-input-placeholder{color:#ddd;opacity:.5;border:0;}#jumptime::-moz-placeholder{color:#ddd;}#jumptime:-ms-input-placeholder{color:#ddd;}#jumptime,#fristtime{width:50px;border:0;background-color:#414141;font-size:12px;padding:3px 3px 3px 3px;margin:2px;border-radius:12px;color:#fff;position:absolute;left:5px;top:3px;display:none;text-align:center;}#link{position:absolute;top:20px;right:15px;border-radius:10px;padding:1px 5px;background:rgba(153,153,153,0.7);color:white;font-size:14px;cursor:pointer;}#close c{float:left;display:none;}.dmlink,.playlink,.palycon{float:left;width:400px;}#link3-error{display:none;}#stats{display:none;right:10px;text-align:center;top:5px;font-size:12px;color:#fdfdfd;text-shadow:1px 1px 1px #000,1px 1px 1px #000;position:fixed;z-index:2147483645;}.yzmplayer-watching-title{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;-o-text-overflow:ellipsis;text-decoration:none;}.flaglist-show li:hover,.playlist-show li:hover{background-color:#2693FF;}
+	</style>
+    <style>
+      .movie-player-loading{position:fixed;inset:0;z-index:25;display:grid;place-items:center;background:#111216;color:#ededf0;text-align:center;font:13px/1.65 -apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;pointer-events:none}.movie-player-loading[hidden]{display:none!important}.movie-player-loading-content{max-width:85%;padding:24px}.movie-player-loading-spinner{display:block;width:23px;height:23px;margin:0 auto 15px;border:2px solid #ffffff20;border-top-color:#c9c9d0;border-radius:50%;animation:movie-player-spin 1s linear infinite}.movie-player-loading-title{font-size:15px;font-weight:500;margin:0 0 5px}.movie-player-loading-detail{color:#a9a9b4;margin:0 0 12px}.movie-player-loading-warning,.movie-player-loading-time{font-size:11px;color:#82828e;margin:4px 0}.movie-player-loading button{pointer-events:auto;margin-top:12px;padding:6px 15px;border:1px solid #ffffff30;border-radius:8px;background:#ffffff10;color:#ededf0;font:inherit;cursor:pointer}.movie-player-loading button:focus-visible{outline:2px solid #a8c7ff;outline-offset:3px}@keyframes movie-player-spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){.movie-player-loading-spinner{animation:none}}
+    </style>
+</head>
+<body> 
+    <div id="player"></div>
+    <div id="movie-player-loading" class="movie-player-loading" role="status" aria-live="polite">
+      <div class="movie-player-loading-content">
+        <span class="movie-player-loading-spinner" aria-hidden="true"></span>
+        <p class="movie-player-loading-title">正在准备播放</p>
+        <p class="movie-player-loading-detail">正在连接播放源，请稍候…</p>
+        <p class="movie-player-loading-warning">请勿相信视频中的广告</p>
+        <p class="movie-player-loading-time"></p>
+        <button type="button" hidden>刷新重试</button>
+      </div>
+    </div>
+    <div id="ADplayer"></div>
+    <div id="ADtip"></div>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/js/player-loading.js?v=20261016c"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/js/player-controls-20261017f.js"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/js/yzmplayer.js"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/js/jquery.min.js"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/js/jquery.md5.js"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/js/setting.js"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/js/hls-1.6.19.min.js"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/js/media-playback-health.js?v=20261016c"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/js/flv.min.js"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/player/cj/dplayer/js/layer.js"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/js/ad-filter-core.js?v=20261016g"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/js/ad-filter-evidence.js?v=20261016g"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/js/ad-filter-templates.js?v=20261016h"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/js/ad-filter-skip.js?v=20261013m"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/js/ad-filter-prompt.js?v=20261013m"></script>
+    <script src="https://newcdnjs.wawacm.com/moviejs/releases/20261020-cdn1/static/js/ad-filter-player.js?v=20261017a"></script>
+    <script>
+        window.MovieAdFeatureFilter = true;
+		if(typeof(parent.MacPlayer) !='undefined'){
+			var videoUrl = parent.MacPlayer.PlayUrl;
+			var id = $.md5(parent.MacPlayer.Id + '-' + parent.MacPlayer.Sid + '-' + parent.MacPlayer.Nid);
+			var next = parent.MacPlayer.PlayLinkNext;
+		}
+		var up = { "usernum": '0'}
+        var config = {
+            "api": '/static/player/cj/dplayer/', 
+            "url": videoUrl, 
+            "id": id, 
+            "pic": "", 
+            "next": next, 
+            "live":0, 
+        };
+
+        // Robust Danmaku List loader:
+        if (window.YZM && window.YZM.danmu) {
+            window.YZM.danmu.relist = function() {
+                $(".list-show").empty();
+                var apiId = (window.YZM && window.YZM.id) || config.id;
+                $.ajax({
+                    url: '/static/player/cj/dplayer/?ac=get&id=' + encodeURIComponent(apiId) + '&_t=' + Date.now(),
+                    cache: false,
+                    dataType: 'json',
+                    success: function(d) {
+                        if (d && d.code == 23 && Array.isArray(d.danmuku)) {
+                            var a = d.danmuku, b = d.name, c = d.danum || a.length;
+                            $(".danmuku-num").text(c);
+                            $(a).each(function(index, item) {
+                                var user = item[8] || '游客';
+                                if (user.indexOf('导入') !== -1 || user.toLowerCase().indexOf('douban') !== -1) {
+                                    user = '游客';
+                                }
+                                var text = item[4] || '';
+                                var timeStr = (window.YZM && typeof window.YZM.formatTime === 'function') ? window.YZM.formatTime(item[0]) : item[0];
+                                var l = '<d class="danmuku-list" time="' + item[0] + '"><li>' + timeStr + '</li><li title="' + text + ' [' + user + ']">' + text + ' [' + user + ']</li><li title="用户：' + user + '">' + (item[6] || '') + '</li><li class="report" onclick="YZM.danmu.report(\'' + item[5] + '\',\'' + b + '\',\'[' + user + '] ' + text + '\',\'' + item[3] + '\')">举报</li></d>';
+                                $(".list-show").append(l);
+                            });
+                            $(".danmuku-list").off("dblclick").on("dblclick", function() {
+                                if (window.YZM && window.YZM.dp && typeof window.YZM.dp.seek === 'function') {
+                                    window.YZM.dp.seek(parseFloat($(this).attr("time")) || 0);
+                                }
+                            });
+                        }
+                    }
+                });
+            };
+        }
+
+        if (window.MovieMediaHealth) MovieMediaHealth.install();
+        if (window.MovieAdStart) MovieAdStart(function(){YZM.start();}); else YZM.start();
+
+        // Active Progressive Danmaku Sync:
+        // Automatically fetches danmaku when video opens, and progressively loads more as user watches.
+        (function initActiveDanmakuSync() {
+            if (typeof parent === 'undefined' || !parent.MacPlayer || !parent.MacPlayer.Id) return;
+            var vodId = parseInt(parent.MacPlayer.Id, 10);
+            var sid = parseInt(parent.MacPlayer.Sid || 1, 10);
+            var nid = parseInt(parent.MacPlayer.Nid || 1, 10);
+            if (!vodId || isNaN(vodId)) return;
+
+            var loadedDanmakuKeys = new Set();
+            var currentStep = 0;
+            var syncInProgress = false;
+
+            function syncExistingDanmaku() {
+                var dp = window.YZM && window.YZM.dp;
+                if (dp && dp.danmaku && Array.isArray(dp.danmaku.dan)) {
+                    for (var i = 0; i < dp.danmaku.dan.length; i++) {
+                        var d = dp.danmaku.dan[i];
+                        if (d && d.text) {
+                            loadedDanmakuKeys.add((d.time || 0).toFixed(1) + '_' + d.text);
+                        }
+                    }
+                }
+            }
+
+            function fetchDanmakuSlice(currentTime, step) {
+                if (syncInProgress) return;
+                syncInProgress = true;
+                syncExistingDanmaku();
+                var url = '/api.php?s=dmai/sync&vod_id=' + vodId + '&sid=' + sid + '&nid=' + nid + '&time=' + encodeURIComponent(currentTime.toFixed(1)) + '&step=' + step + '&_t=' + Date.now();
+                fetch(url, { method: 'GET', credentials: 'same-origin' })
+                    .then(function(res) { return res.ok ? res.json() : null; })
+                    .then(function(data) {
+                        syncInProgress = false;
+                        if (!data || data.code !== 1 || !Array.isArray(data.danmaku)) return;
+                        var list = data.danmaku;
+                        if (!list.length) return;
+                        var dp = window.YZM && window.YZM.dp;
+                        if (dp && dp.danmaku) {
+                            var newItems = 0;
+                            if (!Array.isArray(dp.danmaku.dan)) dp.danmaku.dan = [];
+                            for (var i = 0; i < list.length; i++) {
+                                var item = list[i];
+                                var itemKey = (item.seconds || 0).toFixed(1) + '_' + item.text;
+                                if (loadedDanmakuKeys.has(itemKey)) continue;
+                                loadedDanmakuKeys.add(itemKey);
+                                var danItem = {
+                                    text: item.text,
+                                    color: item.color || '#ffffff',
+                                    type: item.type || 'right',
+                                    time: parseFloat(item.seconds) || 0
+                                };
+                                dp.danmaku.dan.push(danItem);
+                                newItems++;
+                            }
+                            if (newItems > 0) {
+                                if (typeof dp.danmaku.dan.sort === 'function') {
+                                    dp.danmaku.dan.sort(function(a, b) { return a.time - b.time; });
+                                }
+                                if (typeof dp.danmaku.seek === 'function') {
+                                    try { dp.danmaku.seek(); } catch(_) {}
+                                }
+                                if (window.YZM && window.YZM.danmu && typeof window.YZM.danmu.relist === 'function') {
+                                    try { window.YZM.danmu.relist(); } catch(_) {}
+                                }
+                            }
+                        }
+                    })
+                    .catch(function() {
+                        syncInProgress = false;
+                    });
+            }
+
+            // Step 0: Initial fetch immediately upon video launch
+            setTimeout(function() {
+                fetchDanmakuSlice(0, 0);
+                if (window.YZM && window.YZM.danmu && typeof window.YZM.danmu.relist === 'function') {
+                    window.YZM.danmu.relist();
+                }
+            }, 1200);
+
+            // Progressive watch milestones: user watches longer -> fetch more danmaku
+            setInterval(function() {
+                var video = document.querySelector('#player video');
+                if (!video || video.paused || video.ended) return;
+                var cur = video.currentTime || 0;
+                if (cur <= 0) return;
+
+                var targetStep = 0;
+                if (cur >= 300) {
+                    targetStep = 6 + Math.floor((cur - 300) / 60);
+                } else if (cur >= 240) {
+                    targetStep = 5;
+                } else if (cur >= 180) {
+                    targetStep = 4;
+                } else if (cur >= 120) {
+                    targetStep = 3;
+                } else if (cur >= 60) {
+                    targetStep = 2;
+                } else if (cur >= 30) {
+                    targetStep = 1;
+                }
+
+                if (targetStep > currentStep) {
+                    currentStep = targetStep;
+                    fetchDanmakuSlice(cur, currentStep);
+                }
+            }, 4000);
+        })();
+
+        window.addEventListener('message', function(event) {
+            if (event.source !== parent || event.origin !== location.origin || !event.data || event.data.type !== 'movie-dm-seek') return;
+            var seconds = event.data.seconds, video = document.querySelector('#player video');
+            if (typeof seconds !== 'number' || !Number.isFinite(seconds) || seconds < 0 || seconds > 172800 || typeof event.data.requestId !== 'string') return;
+            if (window.MovieAdPlayback) seconds = MovieAdPlayback.originalToClean(seconds);
+            var ok = !!video && video.readyState >= 1 && (!Number.isFinite(video.duration) || seconds < video.duration);
+            if (ok) {
+                try { if(window.MovieAdPlayback)ok=MovieAdPlayback.seekOriginal(seconds);else video.currentTime=seconds;var playing = video.play(); if (playing && playing.catch) playing.catch(function(){}); }
+                catch (_) { ok = false; }
+            }
+            parent.postMessage({type:'movie-dm-seeked',requestId:event.data.requestId,ok:ok}, event.origin);
+        });
+    </script>
+</body>
+</html>

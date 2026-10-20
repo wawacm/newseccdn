@@ -1,0 +1,11 @@
+User-agent: *
+Disallow: /vodshow/
+Disallow: /vod/show/
+Disallow: /index/vod/show/
+Disallow: /index.php/vodshow/
+Disallow: /index.php/vod/show/
+Disallow: /index.php/index/vod/show/
+Disallow: /*?*s=*/vodshow/
+Disallow: /*?*s=*%2Fvodshow%2F
+Disallow: /*?*s=*/vod/show/
+Disallow: /*?*s=*%2Fvod%2Fshow%2F
