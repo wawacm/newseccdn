@@ -1,0 +1,1 @@
+self.onmessage=async e=>{const{buffer:r,moduleUrl:a,options:o}=e.data;try{const t=await(await import(a)).parse(r,{...o,progress:p=>self.postMessage({progress:p})});self.postMessage({result:t})}catch(s){self.postMessage({error:s?.message||"\u6587\u6863\u89E3\u6790\u5931\u8D25"})}};
