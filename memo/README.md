@@ -2,7 +2,7 @@
 
 Base URL: https://newcdnjs.wawacm.com/memo
 
-Current release: [32abaee672ce3a1e](https://newcdnjs.wawacm.com/memo/releases/32abaee672ce3a1e/manifest.json?v=32abaee672ce3a1e)
+Current release: [6b505e891b8ed878](https://newcdnjs.wawacm.com/memo/releases/6b505e891b8ed878/manifest.json?v=6b505e891b8ed878)
 
 97 public static files. JavaScript and CSS use conservative whitespace compression without variable renaming. Image/font binaries and license notices are retained.
 

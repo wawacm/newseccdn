@@ -1,8 +1,8 @@
 {
   "repository": "wawacm/newseccdn",
   "baseUrl": "https://newcdnjs.wawacm.com/memo",
-  "release": "32abaee672ce3a1e",
-  "releaseUrl": "https://newcdnjs.wawacm.com/memo/releases/32abaee672ce3a1e",
+  "release": "6b505e891b8ed878",
+  "releaseUrl": "https://newcdnjs.wawacm.com/memo/releases/6b505e891b8ed878",
   "compression": "Whitespace/comments only; no JS variable renaming or aggressive transforms; image/font binaries unchanged.",
   "files": [
     {
@@ -51,7 +51,7 @@
       "path": "assets/css/main-new.css",
       "bytes": 90354,
       "originalBytes": 113056,
-      "sha256": "8ca8b2be246295102d2ce8c06602fd2565a0974353c9ab5f277d72e07ec0ef52"
+      "sha256": "0cbc18be4c40216809b4486def43cbdb328f9b2566edc6f2f8fd632755bdb467"
     },
     {
       "path": "assets/css/main.css",
@@ -93,7 +93,7 @@
       "path": "assets/css/share-page-new.css",
       "bytes": 3210,
       "originalBytes": 4097,
-      "sha256": "b7bc4573bf4b517450b92dc5fce07e9cbd8e7ea70e94b093946089592d454cc6"
+      "sha256": "3041ec2ba6002397292e6f092b294a01085fab279ec020f7a241793fbb1ed9b9"
     },
     {
       "path": "assets/css/share-page.css",
@@ -333,7 +333,7 @@
       "path": "assets/js/modules/export-module.js",
       "bytes": 8735,
       "originalBytes": 17092,
-      "sha256": "3e3d4b947572b385d72a653daa2918893efecb74547813043f7932c4f8158716"
+      "sha256": "9295ba1392c3bb256b3e36f81f688374edc0c9c62d88513deda2b43b631726a1"
     },
     {
       "path": "assets/js/modules/formatting.js",
@@ -375,7 +375,7 @@
       "path": "assets/js/modules/memo-management.js",
       "bytes": 6138,
       "originalBytes": 11283,
-      "sha256": "bf72817c75ac1ad18b6c99b03f41709923cb079238f9bec9661f23e396e80da3"
+      "sha256": "982c4051e7d89dd86ec05b145d69801e813fba0eee868488d29f194be480c1f4"
     },
     {
       "path": "assets/js/modules/memo-view-handler.js",
@@ -507,7 +507,7 @@
       "path": "assets/js/workspace.bundle.js",
       "bytes": 405771,
       "originalBytes": 679740,
-      "sha256": "137d10dae463645a2a0271f9e17026b61f02398d12c1d62d594c6f5baecf9226"
+      "sha256": "d4bb93c0bbce3a5a5fa7e1e26f050ff40573970e79c4c4eaf9cc5233bf82cb5c"
     },
     {
       "path": "assets/vendor/Material-Symbols-LICENSE.txt",
@@ -543,7 +543,7 @@
       "path": "assets/vendor/material-symbols.css",
       "bytes": 620,
       "originalBytes": 659,
-      "sha256": "0cdab02818479ed59c16916d3955edeb67767d20d09bfbdb3daab3ff14b22c85"
+      "sha256": "cf61f7c083f113c0c8ae940e91169ac9dc18197d375d5239bfeaef7bfb969aab"
     },
     {
       "path": "assets/vendor/vue-3.5.43/LICENSE",
@@ -561,19 +561,19 @@
       "path": "public/index.html",
       "bytes": 154404,
       "originalBytes": 154114,
-      "sha256": "6d0e1de6eddd658cd4f69c4d05838ef5cc35269ab61eb55a14a14d61eeef6310"
+      "sha256": "24258b52cea2a7f40308e4bc78a583a4ad6b219758fcd17479b64601bb4f0e27"
     },
     {
       "path": "public/CN.html",
       "bytes": 154404,
       "originalBytes": 154114,
-      "sha256": "6d0e1de6eddd658cd4f69c4d05838ef5cc35269ab61eb55a14a14d61eeef6310"
+      "sha256": "24258b52cea2a7f40308e4bc78a583a4ad6b219758fcd17479b64601bb4f0e27"
     },
     {
       "path": "public/admin.html",
       "bytes": 87663,
       "originalBytes": 87605,
-      "sha256": "d0794f90d6578ad5bf8648936645587765b13ceb0a28297d6d240c69c37ec412"
+      "sha256": "44b3f668d1894ac2341b8cc3c9028ab4abb008f1ae38d99da96a4a5b6d553e64"
     },
     {
       "path": "public/version-history-modal.html",
@@ -585,7 +585,7 @@
       "path": "public/sw.js",
       "bytes": 2087,
       "originalBytes": 2992,
-      "sha256": "4b5f29a9a94506a77ebd2c077871aebc5092ec37ca3504275433b59c1cf01098"
+      "sha256": "77553d49f70e9fb0044d8499e00b2c57ec1d46ebcdc4979193560bca855efdcb"
     }
   ],
   "originalBytes": 4935232,
