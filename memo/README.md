@@ -2,9 +2,9 @@
 
 Base URL: https://newcdnjs.wawacm.com/memo
 
-Current release: [d57b460618c791a3](https://newcdnjs.wawacm.com/memo/releases/d57b460618c791a3/manifest.json?v=d57b460618c791a3)
+Current release: [fef8f38dc7600c46](https://newcdnjs.wawacm.com/memo/releases/fef8f38dc7600c46/manifest.json?v=fef8f38dc7600c46)
 
-96 public static files. JavaScript and CSS use conservative whitespace compression without variable renaming. Image/font binaries and license notices are retained.
+97 public static files. JavaScript and CSS use conservative whitespace compression without variable renaming. Image/font binaries and license notices are retained.
 
 The public/ directory contains static page shells and fragments; the application and its API continue to run on their original server. PHP, credentials, uploads, backups and databases are excluded. Service workers must still be registered from the application origin.
 
