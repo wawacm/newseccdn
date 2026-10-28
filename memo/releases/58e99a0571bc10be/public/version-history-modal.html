@@ -1,0 +1,89 @@
+<!-- 历史版本弹窗模板 -->
+<div v-if="showVersionHistory" class="version-history-overlay" @click.self="closeVersionHistory">
+    <div class="version-history-modal">
+        <!-- 标题栏 -->
+        <div class="version-history-header">
+            <h3>
+                <span class="material-symbols-outlined">history</span>
+                历史版本
+            </h3>
+            <button class="version-history-close" @click="closeVersionHistory" title="关闭">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+
+        <!-- 主体区域 -->
+        <div class="version-history-body">
+            <!-- 左侧：版本列表 -->
+            <div class="version-list-panel">
+                <div class="version-list-header">
+                    <h4>版本列表</h4>
+                    <p>共 {{ versionHistory.length }} 个版本</p>
+                </div>
+                <div class="version-list">
+                    <div v-if="versionHistory.length === 0" class="version-empty-state">
+                        <span class="material-symbols-outlined">folder_open</span>
+                        <p>暂无历史版本</p>
+                    </div>
+                    <div v-for="(version, index) in versionHistory" :key="version.timestamp" class="version-item"
+                        :class="{ selected: selectedVersion === version }" @click="selectVersion(version)">
+                        <div class="version-item-time">
+                            {{ formatVersionTime(version.timestamp) }}
+                        </div>
+                        <div class="version-item-info">
+                            <span class="material-symbols-outlined">article</span>
+                            {{ version.charCount }} 字符
+                        </div>
+                        <div v-if="index === 0" class="version-item-info" style="color: #28a745; font-weight: 500;">
+                            <span class="material-symbols-outlined">check_circle</span>
+                            当前版本
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：内容预览/对比 -->
+            <div class="version-content-panel">
+                <div class="version-content-header">
+                    <h4>{{ showVersionDiff ? '版本对比' : '版本预览' }}</h4>
+                    <label class="version-compare-toggle">
+                        <input type="checkbox" v-model="showVersionDiff"
+                            :disabled="!selectedVersion || versionHistory.length < 2">
+                        显示差异对比
+                    </label>
+                </div>
+                <div class="version-content-body">
+                    <div v-if="!selectedVersion" class="version-empty-state">
+                        <span class="material-symbols-outlined">touch_app</span>
+                        <p>请选择一个版本查看内容</p>
+                    </div>
+                    <div v-else-if="showVersionDiff" v-html="versionDiffHtml"></div>
+                    <div v-else class="version-content-display" v-html="selectedVersion.content"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 底部操作栏 -->
+        <div class="version-history-footer">
+            <div class="version-info-tip">
+                <span v-if="currentMemo && currentMemo.permission === 'view'" style="color: var(--warning);">
+                    ⚠️ 仅查看权限，无法恢复历史版本
+                </span>
+                <span v-else>
+                    {{ versionHistory.length > 0 ? '提示：最多保留最近 20 个版本' : '' }}
+                </span>
+            </div>
+            <div class="version-history-actions">
+                <button class="version-restore-btn" @click="restoreVersion"
+                    :disabled="!selectedVersion || selectedVersion === versionHistory[0] || (currentMemo && currentMemo.permission === 'view')">
+                    <span v-if="currentMemo && currentMemo.permission === 'view'">仅查看权限</span>
+                    <span v-else-if="selectedVersion === versionHistory[0]">当前版本</span>
+                    <span v-else>恢复此版本</span>
+                </button>
+                <button class="version-cancel-btn" @click="closeVersionHistory">
+                    关闭
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
