@@ -1,8 +1,8 @@
 {
   "repository": "wawacm/newseccdn",
   "baseUrl": "https://newcdnjs.wawacm.com/memo",
-  "release": "58e99a0571bc10be",
-  "releaseUrl": "https://newcdnjs.wawacm.com/memo/releases/58e99a0571bc10be",
+  "release": "ab0ee0563b8d0ce2",
+  "releaseUrl": "https://newcdnjs.wawacm.com/memo/releases/ab0ee0563b8d0ce2",
   "compression": "Whitespace/comments only; no JS variable renaming or aggressive transforms; image/font binaries unchanged.",
   "files": [
     {
@@ -51,7 +51,7 @@
       "path": "assets/css/main-new.css",
       "bytes": 90354,
       "originalBytes": 113056,
-      "sha256": "9b3bac7eb0d9597d9c3f87a50dd3bdb8ed912a716b383f4b45a511482c1fbf97"
+      "sha256": "947f0f99a99914f253b61ba00f94007eb723b30880f057cd324f75a6159deaec"
     },
     {
       "path": "assets/css/main.css",
@@ -93,7 +93,7 @@
       "path": "assets/css/share-page-new.css",
       "bytes": 3210,
       "originalBytes": 4097,
-      "sha256": "b962fdd5ccf4021f71fe25fd42767d3408c6c13bf0bbe49dd70b014b7a132b21"
+      "sha256": "4fb4f7ae4419ee8ba21a19e124803221952eebd91f87953a301ff22b827c8123"
     },
     {
       "path": "assets/css/share-page.css",
@@ -295,9 +295,9 @@
     },
     {
       "path": "assets/js/modules/editor-core.js",
-      "bytes": 74330,
-      "originalBytes": 114671,
-      "sha256": "8d5a7d36e2af52f16775cd2ac14b90b4c01892c42d837cbd1cb07d4ac650e11e"
+      "bytes": 74455,
+      "originalBytes": 114897,
+      "sha256": "909ca3e851011c1552660dee182a0efb515ddb3e0ce8aac00aabfd1d8dbbba1d"
     },
     {
       "path": "assets/js/modules/editor-operations.js",
@@ -333,7 +333,7 @@
       "path": "assets/js/modules/export-module.js",
       "bytes": 8735,
       "originalBytes": 17092,
-      "sha256": "b24f08935c3d58c56bb378166cf66a12225b2072644f36475ed97e162d03b7a2"
+      "sha256": "6c311373d1f657362bda472dc33676f494e5f82c4f4c46e23bd92c225894f0a0"
     },
     {
       "path": "assets/js/modules/formatting.js",
@@ -427,9 +427,9 @@
     },
     {
       "path": "assets/js/modules/security-module.js",
-      "bytes": 27365,
-      "originalBytes": 39121,
-      "sha256": "5b2b0baca359d874662e8a8e4bcc223e6af23fa21cda4d5f8a188f517f012f09"
+      "bytes": 27313,
+      "originalBytes": 39066,
+      "sha256": "4b583e3a46c33cafb2d5c2de0d96fc98ddb79cf24f7c2ec5e354b851558721fe"
     },
     {
       "path": "assets/js/modules/share-module.js",
@@ -511,9 +511,9 @@
     },
     {
       "path": "assets/js/workspace.bundle.js",
-      "bytes": 438993,
-      "originalBytes": 713340,
-      "sha256": "84d66fe1ff2712d8b79f461755634973a07adce886af472323d82402c7648c46"
+      "bytes": 439066,
+      "originalBytes": 713511,
+      "sha256": "edaba3249a80eacb8fb03261acc5d644eaf63d2406ff17b726cd6a2ef7b1a82d"
     },
     {
       "path": "assets/vendor/Material-Symbols-LICENSE.txt",
@@ -561,7 +561,7 @@
       "path": "assets/vendor/material-symbols.css",
       "bytes": 620,
       "originalBytes": 659,
-      "sha256": "25dfa16faf177b396e97c3ae90cf948326e901bb6e1153d6dbb72159d7b1cb25"
+      "sha256": "ad805247346c2f41893e129e034f8564395dfe8d856a6915807b81d7fc4635de"
     },
     {
       "path": "assets/vendor/qrcode-generator/qrcode.js",
@@ -585,19 +585,19 @@
       "path": "public/index.html",
       "bytes": 154404,
       "originalBytes": 154114,
-      "sha256": "b859204c0d721502a82a50ee0b31bcb3e8150f006ab629f5b722c304838d9de4"
+      "sha256": "e7425cf2d2ed61ab190c257c7d46a6fef05e71ceca7c57fdfaf1a4f971f86f99"
     },
     {
       "path": "public/CN.html",
       "bytes": 154404,
       "originalBytes": 154114,
-      "sha256": "b859204c0d721502a82a50ee0b31bcb3e8150f006ab629f5b722c304838d9de4"
+      "sha256": "e7425cf2d2ed61ab190c257c7d46a6fef05e71ceca7c57fdfaf1a4f971f86f99"
     },
     {
       "path": "public/admin.html",
       "bytes": 87663,
       "originalBytes": 87605,
-      "sha256": "de41b4d5ae9498c0c5608ba88023869b6ce4e374ff7f5efafa1a736f651d2454"
+      "sha256": "cb69e2ca59048562de82f3dc7cbc79648a314d613d426749edc1ad94955ffc61"
     },
     {
       "path": "public/version-history-modal.html",
@@ -609,9 +609,9 @@
       "path": "public/sw.js",
       "bytes": 2087,
       "originalBytes": 2992,
-      "sha256": "cac8ee82db7789c8d4e3cf916c69aecfa9c2d6ec11252d36ba3a795603b5ef6b"
+      "sha256": "1ee08f713c79fc144eaab82be4995404d67fad63054e4055f5a6948fe97ac04a"
     }
   ],
-  "originalBytes": 5070870,
-  "publishedBytes": 4246578
+  "originalBytes": 5071212,
+  "publishedBytes": 4246724
 }

@@ -1,0 +1,2175 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>雲亦備忘錄系統 · 娃娃團隊</title>
+    <link rel="icon" type="image/png" href="https://newcdnjs.wawacm.com/favicon.ico">
+    <link rel="preconnect" href="https://newcdnjs.wawacm.com" crossorigin>
+    <link rel="stylesheet" href="https://newcdnjs.wawacm.com/memo/releases/ab0ee0563b8d0ce2/assets/css/workspace.css">
+    <link rel="stylesheet" href="https://newcdnjs.wawacm.com/memo/releases/ab0ee0563b8d0ce2/assets/vendor/material-symbols.css">
+    <style>
+        [v-cloak]>*:not(.loading-screen) {
+            display: none !important;
+        }
+    </style>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+</head>
+
+<body>
+    <div id="app" v-cloak>
+        <div v-if="loading" class="loading-screen" role="status" aria-live="polite">
+            <div class="loading-screen-noise" aria-hidden="true"></div>
+            <div class="loading-shell">
+                <div class="loading-visual" aria-hidden="true">
+                    <span class="loading-orbit loading-orbit-a"></span>
+                    <span class="loading-orbit loading-orbit-b"></span>
+                    <span class="loading-orbit loading-orbit-c"></span>
+                    <div class="loading-core">
+                        <span class="loading-core-ring"></span>
+                        <span class="loading-core-dot"></span>
+                    </div>
+                    <div class="loading-scanline"></div>
+                </div>
+                <div class="loading-panel">
+                    <div class="loading-kicker">Memo Workspace Warmup</div>
+                    <!-- Vue 掛載前顯示靜態提示；v-text 必須用於空元素。 -->
+                    <h1><span v-text="loadingTitle"></span><span v-if="false">雲亦備忘錄</span></h1>
+                    <p class="loading-message"><span v-text="loadingMessage"></span><span v-if="false">正在下載工作台元件...</span></p>
+                    <p class="loading-detail"><span v-text="loadingDetail"></span><span v-if="false">首次開啟或直連源站時可能需要較長時間；完成下載後會繼續驗證會話與讀取備忘錄。</span></p>
+
+                    <div class="loading-progress-block">
+                        <div class="loading-progress-meta">
+                            <span>啟動進度</span>
+                            <strong><span v-text="loadingProgressLabel"></span><span v-if="false">12%</span></strong>
+                        </div>
+                        <div class="loading-progress-track">
+                            <span class="loading-progress-fill" style="width: 12%;"
+                                :style="{ width: loadingProgressLabel }"></span>
+                        </div>
+                    </div>
+
+                    <div class="loading-stage-grid">
+                        <div class="loading-stage-item"
+                            :class="{active: loadingStageKey === 'session', done: loadingStageOrder > 1}">
+                            <span class="loading-stage-dot"></span>
+                            <span>驗證會話</span>
+                        </div>
+                        <div class="loading-stage-item"
+                            :class="{active: loadingStageKey === 'cache', done: loadingStageOrder > 2}">
+                            <span class="loading-stage-dot"></span>
+                            <span>讀取快取</span>
+                        </div>
+                        <div class="loading-stage-item"
+                            :class="{active: loadingStageKey === 'folders', done: loadingStageOrder > 3}">
+                            <span class="loading-stage-dot"></span>
+                            <span>整理目錄</span>
+                        </div>
+                        <div class="loading-stage-item"
+                            :class="{active: loadingStageKey === 'workspace' || loadingStageKey === 'ready', done: loadingStageOrder > 4}">
+                            <span class="loading-stage-dot"></span>
+                            <span>打開備忘錄</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-else class="app-wrapper" :class="{'sidebar-collapsed': desktopSidebarCollapsed && !isMobileDevice}">
+            <div v-if="showGlobalDropOverlay" class="global-drop-overlay">
+                <div class="global-drop-box">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 5 17 10"></polyline>
+                        <line x1="12" y1="5" x2="12" y2="18"></line>
+                    </svg>
+                    <p>釋放即可上傳 DOC / PPT 至 OSS</p>
+                    <small>支援 doc / docx / ppt / pptx，且小於 25MB</small>
+                </div>
+            </div>
+
+            <div v-if="mobileSidebarOpen" class="mobile-sidebar-overlay" @click="toggleMobileSidebar"
+                style="display: none;"></div>
+
+            <aside class="sidebar"
+                :class="{'mobile-open': mobileSidebarOpen, 'desktop-collapsed': desktopSidebarCollapsed && !isMobileDevice}">
+                <div class="sidebar-header">
+                    <div class="logo">
+                        <img src="https://image.wawacm.com/newmemologo.png" alt="雲亦備忘錄"
+                            style="width: 100%; height: auto; display: block; object-fit: contain;">
+                    </div>
+                </div>
+
+                <nav class="nav-menu">
+                    <div class="nav-item" :class="{active: view==='today'}" @click="switchView('today')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                        <span>今日</span>
+                    </div>
+                    <div class="nav-item" :class="{active: view==='all'}" @click="switchView('all')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 3h7v7H3z"></path>
+                            <path d="M14 3h7v7h-7z"></path>
+                            <path d="M14 14h7v7h-7z"></path>
+                            <path d="M3 14h7v7H3z"></path>
+                        </svg>
+                        <span>全部</span>
+                    </div>
+
+                    <!-- 待完成/已完成切換 -->
+                    <div class="nav-item nav-completion-toggle" :class="{active: view==='completion'}">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 11l3 3L22 4"></path>
+                            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        </svg>
+                        <span class="nav-completion-switch-wrap">
+                            <span class="completion-switch" :class="{'is-completed': completionFilter === 'completed'}">
+                                <span class="completion-switch-option" :class="{active: completionFilter === 'pending'}"
+                                    @click.stop="switchCompletionFilter('pending')">待完成</span>
+                                <span class="completion-switch-option"
+                                    :class="{active: completionFilter === 'completed'}"
+                                    @click.stop="switchCompletionFilter('completed')">已完成</span>
+                                <span class="completion-switch-slider"></span>
+                            </span>
+                        </span>
+                    </div>
+
+                    <!-- 文件夾區域 -->
+                    <div class="nav-divider"></div>
+                    <div class="nav-section-header">
+                        <span class="nav-section-label">文件夾</span>
+                        <button class="nav-section-add-btn" @click.stop="toggleNewFolderInput" title="新增文件夾">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                                height="16">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                        </button>
+                    </div>
+                    <div v-show="showNewFolderInput" class="nav-folder-input-wrap">
+                        <input type="text" v-model="newFolderName" class="nav-folder-input" placeholder="輸入文件夾名稱..."
+                            @compositionstart="isComposing = true" @compositionend="isComposing = false"
+                            @keyup.enter="!isComposing && createFolder()" @keyup.escape="cancelNewFolderInput"
+                            maxlength="50" ref="newFolderInput">
+                        <button class="nav-folder-input-btn" @click="createFolder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16"
+                                height="16">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </button>
+                    </div>
+                    <div v-for="folder in folders" :key="folder.id" class="nav-sub-item nav-folder-item"
+                        :class="{active: view==='folder' && currentFolderId == folder.id}"
+                        @click="currentFolderId = folder.id; switchView('folder')"
+                        @contextmenu.prevent="openFolderContextMenu($event, folder)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z">
+                            </path>
+                        </svg>
+                        <span>{{ folder.name }}</span>
+                    </div>
+
+                    <div class="nav-divider"></div>
+
+                    <div class="nav-item nav-item-other"
+                        :class="{active: view==='shared' || view==='trash' || otherNavExpanded}"
+                        @click="toggleOtherNav">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="2"></circle>
+                            <circle cx="19" cy="12" r="2"></circle>
+                            <circle cx="5" cy="12" r="2"></circle>
+                        </svg>
+                        <span>其他</span>
+                        <span class="material-symbols-outlined nav-item-caret">{{ otherNavExpanded ? 'expand_less' : 'expand_more' }}</span>
+                    </div>
+                    <div class="nav-submenu" v-show="otherNavExpanded || view==='shared' || view==='trash'">
+                        <div class="nav-sub-item" :class="{active: view==='shared'}" @click="switchView('shared')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                            <span>與我共享</span>
+                        </div>
+                        <div class="nav-sub-item" :class="{active: view==='trash'}" @click="switchView('trash')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                </path>
+                            </svg>
+                            <span>回收桶</span>
+                        </div>
+                    </div>
+                </nav>
+
+                <div class="user-panel">
+                    <div v-if="user" class="user-info-wrapper">
+                        <div class="user-info">
+                            <img :src="user.avatar || 'https://image.wawacm.com/2025/11/16/788854.png'" class="avatar">
+                            <span>{{ user.username || user.email }}</span>
+                            <div class="user-action-btns" style="position: relative;">
+                                <button class="user-action-btn" @click.stop="showSettingsPopup = !showSettingsPopup"
+                                    title="設定">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                        stroke-linecap="round" stroke-linejoin="round">
+                                        <circle cx="12" cy="12" r="3"></circle>
+                                        <path
+                                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z">
+                                        </path>
+                                    </svg>
+                                </button>
+                                <!-- 設定浮窗 -->
+                                <div v-if="showSettingsPopup" class="settings-popup" @click.stop>
+                                    <div class="settings-popup-item" @click="showSettingsPopup = false; openAccountSecurityModalView()">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+                                            <circle cx="12" cy="10" r="3"></circle>
+                                        </svg>
+                                        <span>賬戶安全</span>
+                                    </div>
+                                    <div class="settings-popup-divider"></div>
+                                    <div class="settings-popup-item" @click="showSettingsPopup = false; showSocialBindModal = true">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                                        </svg>
+                                        <span>綁定社群帳號</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="btn btn-secondary btn-block" @click="logout" style="margin-top: 12px;">
+                            登出
+                        </button>
+                    </div>
+                    <button v-else class="btn btn-primary btn-block" @click="showLogin = true">
+                        登入
+                    </button>
+                </div>
+            </aside>
+
+            <main class="main-area">
+                <header class="top-toolbar" aria-label="備忘錄工具列">
+                    <div class="toolbar-leading">
+                        <button class="toolbar-button toolbar-navigation mobile-menu-btn" type="button"
+                            @click="toggleMobileSidebar" aria-label="開啟側邊欄" :aria-expanded="mobileSidebarOpen">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round"></path>
+                            </svg>
+                        </button>
+                        <button class="toolbar-button toolbar-navigation desktop-sidebar-toggle" type="button"
+                            @click.stop="toggleDesktopSidebar" :aria-label="desktopSidebarCollapsed ? '展開側邊欄' : '收起側邊欄'"
+                            :title="desktopSidebarCollapsed ? '展開側邊欄' : '收起側邊欄'" :aria-expanded="!desktopSidebarCollapsed">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true">
+                                <rect x="3" y="4" width="18" height="16" rx="3"></rect>
+                                <path d="M9 4v16M5.5 8h1M5.5 11h1M5.5 14h1" stroke-linecap="round"></path>
+                            </svg>
+                        </button>
+                        <h1 class="toolbar-title" :title="toolbarTitle">{{ toolbarTitle }}</h1>
+                    </div>
+                    <div class="search-input" :class="{'has-query': searchKeyword}">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                            <circle cx="10.5" cy="10.5" r="6.5"></circle>
+                            <path d="m16 16 4 4" stroke-linecap="round"></path>
+                        </svg>
+                        <input type="text" id="search-input" ref="memoSearchInput" name="search" placeholder="搜尋備忘錄" aria-label="搜尋備忘錄" autocomplete="off"
+                            v-model="searchKeyword" @input="doSearch">
+                        <button v-if="searchKeyword" class="search-clear" type="button" aria-label="清除搜尋"
+                            @click="searchKeyword = ''; doSearch(); $refs.memoSearchInput.focus()">
+                            <span aria-hidden="true">×</span>
+                        </button>
+                    </div>
+                    <div class="toolbar-actions">
+                        <button class="toolbar-button toolbar-select" :class="{active: batchMode}" type="button"
+                            @click="batchMode = !batchMode" :aria-pressed="batchMode" :aria-label="batchMode ? '結束批次選取' : '批次選取備忘錄'" title="批次操作">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <rect x="3" y="3" width="18" height="18" rx="5"></rect>
+                                <path d="m7.5 12 3 3 6-6" stroke-linecap="round" stroke-linejoin="round"></path>
+                            </svg>
+                            <span>{{ batchMode ? '完成' : '選取' }}</span>
+                        </button>
+                        <button class="toolbar-button toolbar-new" type="button" @click="newMemo" aria-label="新增備忘錄">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                                <path d="M12 5v14M5 12h14" stroke-linecap="round"></path>
+                            </svg>
+                            <span>新增</span>
+                        </button>
+                    </div>
+                </header>
+
+                <div v-if="batchMode" class="batch-bar">
+                    <span v-if="selectedIds.length > 0">已選擇 {{ selectedIds.length }} 項</span>
+                    <span v-else>請選擇要操作的備忘錄</span>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end;">
+                        <button class="btn"
+                            :style="{background: selectedIds.length === filteredMemos.length && filteredMemos.length > 0 ? 'rgba(52,199,89,0.3)' : 'rgba(255,255,255,0.3)'}"
+                            @click="selectAll"
+                            :title="selectedIds.length === filteredMemos.length && filteredMemos.length > 0 ? '取消全選' : '全選'">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" style="margin-right: 4px;">
+                                <path d="M9 11l3 3L22 4"></path>
+                                <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                            </svg>
+                            {{ selectedIds.length === filteredMemos.length && filteredMemos.length > 0 ? '✓ 已全選' : '全選' }}
+                        </button>
+                        <button v-if="selectedIds.length > 0" class="btn" style="background: rgba(255,255,255,0.24);"
+                            @click="batchCollaborateMemos">
+                            共創備忘錄 </button>
+                        <button v-if="selectedIds.length > 0" class="btn" style="background: rgba(255,255,255,0.24);"
+                            @click="batchMoveToFolderMemos">
+                            移動文件夾 </button>
+                        <button v-if="selectedIds.length > 0" class="btn" style="background: rgba(255,255,255,0.24);"
+                            @click="batchMarkPendingMemos">
+                            標記待完成 </button>
+                        <button v-if="selectedIds.length > 0" class="btn" style="background: rgba(255,255,255,0.24);"
+                            @click="batchUpdateMemoColor">
+                            更改便條顏色
+                        </button>
+                        <button v-if="selectedIds.length > 0" class="btn" style="background: rgba(255,255,255,0.2);"
+                            @click="batchDeleteMemos">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" style="margin-right: 4px;">
+                                <polyline points="3 6 5 6 21 6"></polyline>
+                                <path
+                                    d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2">
+                                </path>
+                            </svg>
+                            刪除選中
+                        </button>
+                        <button class="btn" style="background: rgba(255,255,255,0.1);"
+                            @click="batchMode = false; selectedIds = []">
+                            取消
+                        </button>
+                    </div>
+                </div>
+
+                <div class="memo-grid" ref="memoGrid" @scroll.passive="handleMemoGridScroll">
+                    <div v-if="loadingMoreMemos && filteredMemos.length === 0" class="empty-state"
+                        style="grid-column: 1/-1;">
+                        <div class="spinner" style="width: 48px; height: 48px; margin: 0 auto 16px;"></div>
+                        <p>載入中...</p>
+                    </div>
+
+                    <div v-else-if="!loadingMoreMemos && filteredMemos.length === 0" class="empty-state"
+                        style="grid-column: 1/-1;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                            <polyline points="14 2 14 8 20 8"></polyline>
+                        </svg>
+                        <p>暫無備忘錄</p>
+                        <button class="btn btn-primary" @click="newMemo">建立第一個備忘錄</button>
+                    </div>
+
+                    <div v-for="memo in filteredMemos" :key="memo.id" class="memo-card" :class="[
+                                {selected: isSelected(memo.id)},
+                                {'document-card': isDocumentMemo(memo)},
+                                {'memo-completed': memo.is_completed == 1},
+                                {'memo-pinned': memo.is_pinned == 1},
+                                'memo-color-' + getMemoStableColor(memo),
+                                'memo-tape-v-' + getMemoTapeVariant(memo)
+                              ]" @click="handleCardClick(memo)" @contextmenu.prevent="openContextMenu($event, memo)"
+                        @touchstart="handleTouchStart($event, memo)" @touchend="handleTouchEnd($event)"
+                        @touchmove="handleTouchMove($event)">
+                        <div v-if="memo.is_pinned == 1" class="memo-pinboard" role="img" aria-label="已置頂">
+                            <svg v-for="side in ['left', 'right']" :key="side" class="memo-pin" :class="'memo-pin-' + side"
+                                viewBox="0 0 32 32" width="32" height="32" aria-hidden="true">
+                                <ellipse class="memo-pin-shadow" cx="18" cy="23" rx="8" ry="2.5" fill="#5d3e23" opacity="0.16"></ellipse>
+                                <g class="memo-pin-body">
+                                    <path d="M14.5 13h3L16 22z" fill="#77818a"></path>
+                                    <path d="M12 5h8v6l4 3v2H8v-2l4-3z" fill="#b2763c"></path>
+                                    <path d="M12 6h3v6l-4 2h-2l3-3z" fill="#e4b478"></path>
+                                    <ellipse cx="16" cy="16" rx="8" ry="2.6" fill="#986031"></ellipse>
+                                    <ellipse cx="16" cy="14.5" rx="8" ry="2.6" fill="#d39a58"></ellipse>
+                                    <ellipse cx="16" cy="5.5" rx="7.5" ry="3.5" fill="#a96c34"></ellipse>
+                                    <ellipse cx="16" cy="4" rx="7.5" ry="3.5" fill="#e0ab6a"></ellipse>
+                                    <path d="M11.5 3.8c1.6-1.2 3.6-1.5 5.5-1.1" fill="none" stroke="#fff0d6" stroke-width="1.3" stroke-linecap="round"></path>
+                                </g>
+                            </svg>
+                            <span class="memo-pinned-label">已置頂</span>
+                        </div>
+                        <div v-if="batchMode" class="memo-checkbox" @click.stop>
+                            <input type="checkbox" :id="'memo-select-' + memo.id" :name="'memo-select-' + memo.id"
+                                :checked="isSelected(memo.id)" @change="toggleSelect(memo.id)">
+                        </div>
+                        <template v-if="isDocumentMemo(memo)">
+                            <div class="doc-card-head">
+                                <div class="doc-icon" :class="'ext-' + (getDocumentMeta(memo)?.extension || 'doc')">
+                                    {{ (getDocumentMeta(memo)?.extension || 'doc').toUpperCase() }}
+                                </div>
+                                <div>
+                                    <div class="doc-card-title">{{ getDocumentMeta(memo)?.fileName || memo.title || '文件' }}</div>
+                                    <div class="doc-card-meta">
+                                        {{ formatDate(memo.updated_at || memo.created_at) }}
+                                        <span v-if="getDocumentMeta(memo)?.sizeText"> · {{ getDocumentMeta(memo)?.sizeText }}</span>
+                                    </div>
+                                    <div class="doc-card-meta" style="font-size:12px;">點擊卡片可直接線上預覽</div>
+                                </div>
+                            </div>
+                            <div class="doc-card-actions">
+                                <button class="doc-action-btn" @click.stop="shareMemo(memo)">
+                                    分享
+                                </button>
+                                <button class="doc-action-btn" @click.stop="renameMemo(memo)">
+                                    更名
+                                </button>
+                                <button class="doc-action-btn danger" @click.stop="deleteMemo(memo)">
+                                    刪除
+                                </button>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div class="memo-title" :class="{'memo-title-long': isMemoTitleLong(memo)}">
+                                <span v-if="memo.is_locked" class="lock-icon">🔒</span>
+                                {{ memo.title || '無標題' }}
+                                <span v-if="memo.is_completed == 1" class="memo-completed-badge" title="已完成">✓</span>
+                            </div>
+                            <div class="memo-date">{{ formatDate(memo.updated_at || memo.created_at) }}</div>
+                            <div class="memo-preview">{{ getPreview(memo) }}</div>
+                        </template>
+                    </div>
+
+                    <div v-if="filteredMemos.length > 0"
+                        style="grid-column: 1/-1; text-align: center; margin-top: 20px;">
+                        <div v-if="loadingMoreMemos" style="color: var(--text-secondary); font-size: 14px;">
+                            <div class="spinner" style="width: 24px; height: 24px; margin: 0 auto 8px;"></div>
+                            載入中...
+                        </div>
+                        <button v-else-if="hasMoreMemos" class="btn" @click="loadMoreMemos"
+                            style="background: var(--card-bg); color: var(--text); padding: 12px 32px;">
+                            載入更多
+                        </button>
+                        <div v-else style="color: var(--text-secondary); font-size: 13px; padding: 12px;">
+                            已載入全部 {{ filteredMemos.length }} 篇備忘錄
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <div v-if="currentMemo && activeEditorSessionId" class="editor-modal editor-workspace-modal"
+            :class="{fullscreen: fullscreen}">
+            <div class="editor-workspace-shell">
+                <aside class="editor-session-tabs" :class="{collapsed: editorSessionTabsCollapsed}"
+                    v-if="editorSessions.length > 0">
+                    <div class="editor-session-tabs-head">
+                        <div class="editor-session-tabs-head-left">
+                            <span class="material-symbols-outlined">note_stack</span>
+                            <span class="session-head-text">已開啟</span>
+                        </div>
+                        <button class="session-tabs-toggle-btn" @click.stop="toggleEditorSessionTabs"
+                            :title="editorSessionTabsCollapsed ? '展開標籤欄' : '收起標籤欄'">
+                            <span class="material-symbols-outlined">{{ editorSessionTabsCollapsed ? 'chevron_right' : 'chevron_left' }}</span>
+                        </button>
+                    </div>
+                    <div class="editor-session-tab-list">
+                        <div v-for="session in editorSessions" :key="session.id" class="editor-session-tab"
+                            :class="{active: activeEditorSessionId === session.id, minimized: session.minimized}"
+                            @click="session.minimized ? restoreEditorSession(session.id) : switchEditorSession(session.id)"
+                            :title="getEditorSessionTitle(session)">
+                            <span class="material-symbols-outlined tab-icon">
+                                {{ session.minimized ? 'stat_minus_3' : 'description' }}
+                            </span>
+                            <span class="tab-title">{{ getEditorSessionTitle(session) }}</span>
+                            <button type="button" class="tab-close-btn" @click.stop.prevent="closeEditor(session.id)" title="關閉">
+                                <span class="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+                    </div>
+                </aside>
+                <div class="editor-box"
+                    :class="{'toolbar-collapsed': editorToolbarCollapsed, ['theme-' + (currentMemo?.background_theme || 'none')]: true}">
+                    <div class="editor-toolbar">
+                        <div class="memo-title-tag">
+                            <span class="tag-pin tag-pin-left" aria-hidden="true"></span>
+                            <span class="tag-pin tag-pin-right" aria-hidden="true"></span>
+                            <span class="tag-bridge" aria-hidden="true"></span>
+                            <input type="text" id="memo-title" name="memo-title" class="title-input"
+                                v-model="currentMemo.title" placeholder="在這裡輸入備忘錄標題..." @input="onEdit"
+                                :disabled="editorLoading || currentMemo._fullContentLoaded === false || currentMemo.permission === 'view'"
+                                :readonly="currentMemo.permission === 'view'">
+                        </div>
+
+                        <button type="button" class="btn-icon editor-fullscreen-btn" @click="toggleFullscreen"
+                            :title="fullscreen ? '退出全螢幕' : '全螢幕'">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path v-if="!fullscreen"
+                                    d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3">
+                                </path>
+                                <path v-else
+                                    d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3">
+                                </path>
+                            </svg>
+                        </button>
+
+                        <button type="button" class="btn-icon editor-save-btn" @click="saveNow" title="儲存"
+                            :disabled="currentMemo.permission === 'view'">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                        </button>
+
+                        <button type="button" class="btn-icon editor-close-btn"
+                            @click.stop.prevent="handleEditorCloseTap($event)"
+                            @touchstart.stop
+                            @touchend.stop.prevent="handleEditorCloseTap($event)"
+                            title="關閉">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+
+                        <button type="button" class="btn-icon editor-minimize-btn" @click="minimizeCurrentEditor" title="最小化視窗">
+                            <span class="material-symbols-outlined">stat_minus_1</span>
+                        </button>
+
+                        <button type="button" class="btn-icon editor-toolbar-collapse-btn" v-if="currentMemo.permission !== 'view'"
+                            @click="toggleEditorToolbar" :title="editorToolbarCollapsed ? '展開工具列' : '收起工具列'">
+                            <span class="material-symbols-outlined">
+                                {{ editorToolbarCollapsed ? 'unfold_more' : 'unfold_less' }}
+                            </span>
+                        </button>
+
+                        <div v-if="isMobileDevice && currentMemo.permission !== 'view' && editorToolbarCollapsed && mobileToolbarHintVisible"
+                            class="mobile-toolbar-hint" aria-live="polite">
+                            <span class="material-symbols-outlined">touch_app</span>
+                            <span>点我展开工具栏</span>
+                        </div>
+                    </div>
+
+                    <div class="editor-toolbar-new editor-toolbar-grouped"
+                        v-if="!editorToolbarCollapsed && currentMemo.permission !== 'view'">
+                        <div class="toolbar-group" @click.stop>
+                            <button class="toolbar-group-trigger" @click.stop="toggleToolbarGroup('text')"
+                                :class="{active: activeToolbarGroup === 'text'}" title="文字與樣式">
+                                <span class="material-symbols-outlined">format_size</span>
+                                <span class="toolbar-group-label">文字</span>
+                                <span class="material-symbols-outlined toolbar-group-caret">
+                                    {{ activeToolbarGroup === 'text' ? 'expand_less' : 'expand_more' }}
+                                </span>
+                            </button>
+                            <div class="toolbar-group-panel" v-if="activeToolbarGroup === 'text'" @click.stop>
+                                <div class="toolbar-group-row icon-row">
+                                    <button class="toolbar-btn-new" @click="execCommand('bold')" title="粗體 (Ctrl+B)">
+                                        <span class="material-symbols-outlined">format_bold</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="execCommand('italic')" title="斜體 (Ctrl+I)">
+                                        <span class="material-symbols-outlined">format_italic</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="execCommand('underline')"
+                                        title="底線 (Ctrl+U)">
+                                        <span class="material-symbols-outlined">format_underlined</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="execCommand('strikeThrough')" title="刪除線">
+                                        <span class="material-symbols-outlined">strikethrough_s</span>
+                                    </button>
+                                </div>
+                                <div class="toolbar-group-row">
+                                    <select id="font-size-select" name="font-size" class="toolbar-select-new"
+                                        @change="changeFontSize($event.target.value)">
+                                        <option value="">字號</option>
+                                        <option value="12px">極小</option>
+                                        <option value="14px">較小</option>
+                                        <option value="16px">小</option>
+                                        <option value="18px">中</option>
+                                        <option value="20px">正常</option>
+                                        <option value="24px">大</option>
+                                        <option value="32px">很大</option>
+                                    </select>
+                                    <select id="format-block-select" name="format-block" class="toolbar-select-new"
+                                        @change="formatBlock($event.target.value)">
+                                        <option value="">段落樣式</option>
+                                        <option value="h1">標題 1</option>
+                                        <option value="h2">標題 2</option>
+                                        <option value="h3">標題 3</option>
+                                        <option value="p">內文</option>
+                                    </select>
+                                </div>
+                                <div class="toolbar-group-row">
+                                    <div class="color-picker-wrapper">
+                                        <button class="color-picker-btn text-color" @click="openColorPicker('text')"
+                                            title="文字顏色">
+                                            <div class="color-preview" :style="{backgroundColor: currentTextColor}">
+                                            </div>
+                                            <span class="label">文字</span>
+                                        </button>
+                                    </div>
+                                    <div class="color-picker-wrapper">
+                                        <button class="color-picker-btn bg-color" @click="openColorPicker('back')"
+                                            title="背景顏色">
+                                            <div class="color-preview" :style="{backgroundColor: currentBgColor}"></div>
+                                            <span class="label">背景</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toolbar-group" @click.stop>
+                            <button class="toolbar-group-trigger" @click.stop="toggleToolbarGroup('layout')"
+                                :class="{active: activeToolbarGroup === 'layout'}" title="段落與對齊">
+                                <span class="material-symbols-outlined">format_align_left</span>
+                                <span class="toolbar-group-label">段落</span>
+                                <span class="material-symbols-outlined toolbar-group-caret">
+                                    {{ activeToolbarGroup === 'layout' ? 'expand_less' : 'expand_more' }}
+                                </span>
+                            </button>
+                            <div class="toolbar-group-panel" v-if="activeToolbarGroup === 'layout'" @click.stop>
+                                <div class="toolbar-group-row icon-row">
+                                    <button class="toolbar-btn-new" @click="smartInsertList('unordered')"
+                                        title="無序清單（再按可巢狀）">
+                                        <span class="material-symbols-outlined">format_list_bulleted</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="smartInsertList('ordered')"
+                                        title="有序清單（再按可巢狀）">
+                                        <span class="material-symbols-outlined">format_list_numbered</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="editorIndent" title="增加縮排 (Tab)">
+                                        <span class="material-symbols-outlined">format_indent_increase</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="editorOutdent" title="減少縮排 (Shift+Tab)">
+                                        <span class="material-symbols-outlined">format_indent_decrease</span>
+                                    </button>
+                                </div>
+                                <div class="toolbar-group-row icon-row">
+                                    <button class="toolbar-btn-new" @click="execCommand('justifyLeft')" title="靠左對齊">
+                                        <span class="material-symbols-outlined">format_align_left</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="execCommand('justifyCenter')" title="置中">
+                                        <span class="material-symbols-outlined">format_align_center</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="execCommand('justifyRight')" title="靠右對齊">
+                                        <span class="material-symbols-outlined">format_align_right</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toolbar-group" @click.stop>
+                            <button class="toolbar-group-trigger" @click.stop="toggleToolbarGroup('insert')"
+                                :class="{active: activeToolbarGroup === 'insert'}" title="插入內容">
+                                <span class="material-symbols-outlined">add_circle</span>
+                                <span class="toolbar-group-label">插入</span>
+                                <span class="material-symbols-outlined toolbar-group-caret">
+                                    {{ activeToolbarGroup === 'insert' ? 'expand_less' : 'expand_more' }}
+                                </span>
+                            </button>
+                            <div class="toolbar-group-panel" v-if="activeToolbarGroup === 'insert'" @click.stop>
+                                <div class="toolbar-group-row icon-row">
+                                    <button class="toolbar-btn-new" @click="insertImage" title="插入圖片">
+                                        <span class="material-symbols-outlined">image</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="insertLink" title="插入連結">
+                                        <span class="material-symbols-outlined">link</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="insertTable" title="插入表格">
+                                        <span class="material-symbols-outlined">table</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="insertCodeBlock" title="插入程式碼區塊">
+                                        <span class="material-symbols-outlined">code</span>
+                                    </button>
+                                    <button class="toolbar-btn-new" @click="insertTaskCheckbox" title="插入任務勾選框">
+                                        <span class="material-symbols-outlined">check_box</span>
+                                    </button>
+                                </div>
+                                <div class="toolbar-group-row">
+                                    <button class="toolbar-btn-new toolbar-btn-text" @click="insertTableRowAfter"
+                                        title="在目前行下方新增一行">
+                                        + 行 </button>
+                                    <button class="toolbar-btn-new toolbar-btn-text" @click="insertTableColumnAfter"
+                                        title="在目前列右側新增一列">
+                                        + 列 </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="toolbar-group" @click.stop>
+                            <button class="toolbar-group-trigger" @click.stop="toggleToolbarGroup('tools')"
+                                :class="{active: activeToolbarGroup === 'tools'}" title="其他工具">
+                                <span class="material-symbols-outlined">build</span>
+                                <span class="toolbar-group-label">工具</span>
+                                <span class="material-symbols-outlined toolbar-group-caret">
+                                    {{ activeToolbarGroup === 'tools' ? 'expand_less' : 'expand_more' }}
+                                </span>
+                            </button>
+                            <div class="toolbar-group-panel" v-if="activeToolbarGroup === 'tools'" @click.stop>
+                                <div class="toolbar-group-row icon-row">
+                                    <button class="toolbar-btn-new" @click="removeFormat" title="清除格式">
+                                        <span class="material-symbols-outlined">format_clear</span>
+                                    </button>
+                                    <button class="toolbar-btn-new toolbar-lock-btn"
+                                        v-if="currentMemo && user && !currentMemo.shared_from_user_id"
+                                        @click="currentMemo.is_locked ? removeLock() : openLockDialog()"
+                                        :title="currentMemo.is_locked ? '取消上鎖' : '啟用上鎖'">
+                                        <span class="material-symbols-outlined">
+                                            {{ currentMemo.is_locked ? 'lock' : 'lock_open' }}
+                                        </span>
+                                    </button>
+                                    <button class="toolbar-btn-new mobile-ai-btn" @click="addSelectionToAI"
+                                        title="增加到AI對話" v-if="isMobileDevice">
+                                        <span class="material-symbols-outlined">smart_toy</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="toolbar-toggle-btn zipper-toggle-btn" @click="toggleEditorToolbar"
+                        :title="editorToolbarCollapsed ? '展開工具列' : '收起工具列'">
+                        <span class="zipper-teeth" aria-hidden="true"></span>
+                    </button>
+
+                    <div class="ai-review-bar-new" v-if="showAIReview">
+                        <div class="ai-review-text">
+                            ✨AI已修改內容（<span class="ai-original">原文標記</span> → <span class="ai-new">新內容</span>） </div>
+                        <button class="ai-review-btn accept" @click="acceptAIEdit">✓ 接受修改</button>
+                        <button class="ai-review-btn reject" @click="rejectAIEdit">✗ 拒絕修改</button>
+                    </div>
+
+                    <div v-if="editorLoading" class="editor-loading-overlay">
+                        <div class="editor-loading-content">
+                            <div class="spinner" style="width: 40px; height: 40px; margin: 0 auto 12px;"></div>
+                            <p>載入內容中...</p>
+                        </div>
+                    </div>
+
+                    <div class="editor-content-new" :contenteditable="!editorLoading && currentMemo._fullContentLoaded !== false && currentMemo.permission !== 'view'"
+                        :class="{'editor-readonly': currentMemo.permission === 'view'}" ref="editorContent"
+                        @input="onEditorInput" @drop.prevent="handleEditorDrop" @dragover.prevent="handleEditorDragOver"
+                        @paste="handleEditorPaste">
+                    </div>
+
+                    <input type="file" ref="imageInput" accept="image/*" style="display: none;"
+                        @change="handleImageUpload">
+
+                    <div class="editor-footer">
+                        <button v-if="user && currentMemo.permission !== 'view'" class="history-btn"
+                            @click="openHistoryModal" title="查看歷史版本" style="margin-right: 12px;">
+                            <span class="material-symbols-outlined" style="font-size: 16px;">history</span>
+                            歷史版本
+                        </button>
+
+                        <div v-if="currentMemo.shared_from_user_id && currentMemo.permission === 'edit'"
+                            style="font-size: 13px; color: #d97706; margin-right: auto; display: flex; align-items: center; gap: 6px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="8.5" cy="7" r="4"></circle>
+                                <path d="M20 8v6M23 11h-6"></path>
+                            </svg>
+                            共創模式 - 需手動儲存
+                        </div>
+
+                        <div v-else-if="currentMemo.permission === 'view'"
+                            style="font-size: 13px; color: var(--warning); margin-right: auto; display: flex; align-items: center; gap: 6px;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="12" y1="8" x2="12" y2="12"></line>
+                                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                            </svg>
+                            僅查看權限 - 無法編輯此備忘錄
+                        </div>
+
+                        <div v-else-if="!user" style="font-size: 13px; color: var(--warning); margin-right: auto;">
+                            訪客模式 - 請登入以永久儲存
+                        </div>
+
+                        <div v-else style="flex: 1;"></div>
+
+                        <div class="save-status" :class="saveState">
+                            <span>{{ charCount }} 字元</span>
+                            <span v-if="saveState === 'saved'">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="3">
+                                    <polyline points="20 6 9 17 4 12"></polyline>
+                                </svg>
+                                {{ lastSaved }}
+                            </span>
+                            <span v-else-if="saveState === 'saving'">儲存中...</span>
+                            <span v-else-if="saveState === 'manual'" style="color: #d97706;">請手動儲存</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="minimized-editor-dock" v-if="minimizedEditorSessions.length > 0">
+            <div v-for="session in minimizedEditorSessions" :key="'mini-' + session.id" class="minimized-editor-window"
+                :style="getMinimizedWindowStyle(session)" @mouseup="syncMinimizedWindowSize(session, $event)">
+                <div class="minimized-editor-header" @mousedown.stop="startMinimizedWindowDrag(session, $event)"
+                    @touchstart.stop.prevent="startMinimizedWindowTouchDrag(session, $event)">
+                    <span class="material-symbols-outlined">description</span>
+                    <span class="mini-title">{{ getEditorSessionTitle(session) }}</span>
+                    <div class="mini-actions">
+                        <button type="button" class="mini-action-btn" @click.stop="hideMinimizedDockWindow(session.id)"
+                            @touchstart.stop @touchend.stop.prevent="hideMinimizedDockWindow(session.id)"
+                            title="僅顯示於標籤欄">
+                            <span class="material-symbols-outlined">remove</span>
+                        </button>
+                        <button type="button" class="mini-action-btn" @click.stop="restoreEditorSession(session.id)" @touchstart.stop
+                            @touchend.stop.prevent="restoreEditorSession(session.id)" title="還原">
+                            <span class="material-symbols-outlined">open_in_full</span>
+                        </button>
+                        <button type="button" class="mini-action-btn" @click.stop="closeEditor(session.id)" @touchstart.stop
+                            @touchend.stop.prevent="closeEditor(session.id)" title="關閉">
+                            <span class="material-symbols-outlined">close</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="minimized-editor-body">
+                    <div v-if="session.loading" class="minimized-editor-loading">
+                        <div class="spinner mini-window-spinner"></div>
+                        <p>{{ session.loadingMessage || '正在后台载入内容...' }}</p>
+                        <div class="minimized-editor-loading-preview">{{ getPreview(session.memo) || '内容准备中...' }}</div>
+                    </div>
+                    <div v-else class="minimized-editor-editable" :contenteditable="session.memo.permission !== 'view'"
+                        :class="{readonly: session.memo.permission === 'view'}" v-html="getSessionDisplayContent(session)"
+                        @input="handleMinimizedEditorInput(session, $event)" @blur="handleMinimizedEditorBlur(session)">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showLogin" class="login-modal" @click.self="showLogin = false">
+            <div class="login-box">
+                <div class="login-header">
+                    <svg class="login-icon" viewBox="0 0 1024 1024">
+                        <path d="M496.3 738.3h62.2v121.8h-62.2z" fill="#F8B62D"></path>
+                        <path
+                            d="M558.5 870.4h-62.2c-5.7 0-10.4-4.7-10.4-10.4V738.3c0-5.7 4.7-10.4 10.4-10.4h62.2c5.7 0 10.4 4.7 10.4 10.4V860c0 5.8-4.6 10.4-10.4 10.4z m-51.8-20.8h41.4v-101h-41.4v101z"
+                            fill="#3E3A39"></path>
+                        <path
+                            d="M717.7 874.8H371.1c-10.3 0-18.7 8.4-18.7 18.7 0 10.3 8.4 18.7 18.7 18.7h346.6c10.3 0 18.7-8.4 18.7-18.7 0-10.3-8.4-18.7-18.7-18.7zM807.2 324.8c-0.3 0-0.6-0.1-0.9-0.1H280.2c-15.3 0-27.7 12.4-27.7 27.7v357.4c0 1.8 0.2 3.5 0.5 5.2 2.4 12.8 13.7 22.6 27.2 22.6h128.9c372.5-71.7 404-306.3 398.1-412.8z"
+                            fill="#FCEE21"></path>
+                        <path
+                            d="M806.3 737.7c15.3 0 27.7-12.4 27.7-27.7V352.5c0-15-11.9-27.2-26.8-27.6C813 431.4 781.6 666 409.1 737.7h397.2z"
+                            fill="#F8B62D"></path>
+                        <path
+                            d="M710.3 922.7H344.5c-20.1 0-36.5-16.4-36.5-36.5s16.4-36.5 36.5-36.5h365.8c20.1 0 36.5 16.4 36.5 36.5s-16.4 36.5-36.5 36.5z m-365.8-52.3c-8.7 0-15.7 7-15.7 15.7s7 15.7 15.7 15.7h365.8c8.7 0 15.7-7 15.7-15.7s-7-15.7-15.7-15.7H344.5z"
+                            fill="#3E3A39"></path>
+                    </svg>
+                    <h2>{{ isRegister ? '註冊帳號' : '登入' }}</h2>
+                </div>
+
+                <form @submit.prevent="doLogin">
+                    <div class="input-group">
+                        <div class="input-label">
+                            <svg viewBox="0 0 1024 1024">
+                                <path
+                                    d="M512 589.44L36.096 180.48c2.56-0.576 4.864-1.664 7.488-1.664H980.48c1.6 0 4.992 1.152 7.552 1.6L512 589.44z m510.976-352.384v614.784c0 3.84-1.152 7.168-2.048 10.688l-337.92-348.544L1020.416 224c1.344 4.16 2.56 8.448 2.56 13.056zM3.584 223.936L341.12 513.984 3.2 862.528c-0.832-3.456-2.112-6.848-2.112-10.688V237.056c0-4.672 1.28-8.896 2.56-13.12z m646.528 328.896l340.736 351.36c-3.392 0.896-6.72 2.176-10.432 2.176H43.584c-3.584 0-6.912-1.28-10.24-2.176l340.672-351.36 124.352 106.88a20.672 20.672 0 0 0 27.264 0l124.48-106.88z"
+                                    fill="#51A9FF" />
+                            </svg>
+                            信箱
+                        </div>
+                        <input type="email" id="login-email" name="email" class="input-field" v-model="loginForm.email"
+                            placeholder="請輸入信箱" required>
+                    </div>
+
+                    <div class="input-group">
+                        <div class="input-label">
+                            <svg viewBox="0 0 1024 1024">
+                                <path
+                                    d="M785.066667 892.586667H238.933333c-37.546667 0-68.266667-32.426667-68.266666-71.68V450.56c0-39.253333 30.72-71.68 68.266666-71.68h546.133334c37.546667 0 68.266667 32.426667 68.266666 71.68v370.346667c0 39.253333-30.72 71.68-68.266666 71.68zM238.933333 447.146667v373.76c0 1.706667 1.706667 3.413333 1.706667 3.413333H785.066667V450.56c0-1.706667-1.706667-3.413333-1.706667-3.413333H238.933333z"
+                                    fill="#3793DF" />
+                                <path
+                                    d="M682.666667 448.853333H341.333333v-145.066666c0-93.866667 76.8-170.666667 170.666667-170.666667 44.373333 0 87.04 17.066667 121.173333 47.786667C665.6 213.333333 682.666667 256 682.666667 303.786667v145.066666z m-273.066667-68.266666h204.8v-76.8c0-29.013333-10.24-54.613333-29.013333-73.386667-20.48-18.773333-46.08-29.013333-73.386667-29.013333-56.32 0-102.4 46.08-102.4 102.4v76.8z"
+                                    fill="#3793DF" />
+                            </svg>
+                            密碼
+                        </div>
+                        <input type="password" id="login-password" name="password" class="input-field"
+                            v-model="loginForm.password" placeholder="請輸入密碼" required>
+                    </div>
+
+                    <div v-if="isRegister" class="input-group">
+                        <div class="input-label">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2">
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="12" cy="7" r="4"></circle>
+                            </svg>
+                            使用者名稱（可選）
+                        </div>
+                        <input type="text" id="login-username" name="username" class="input-field"
+                            v-model="loginForm.username" placeholder="請輸入使用者名稱">
+                    </div>
+
+                    <div class="login-actions">
+                        <button type="submit" class="btn btn-primary btn-block">
+                            {{ isRegister ? '註冊' : '登入' }}
+                        </button>
+                        <div id="captcha-status"
+                            style="font-size: 12px; color: #999; margin-top: 8px; text-align: center;">等待初始化...</div>
+                    </div>
+                </form>
+
+                <div style="margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border);">
+                    <div
+                        style="text-align: center; margin-bottom: 16px; color: var(--text-secondary); font-size: 14px;">
+                        或使用社群帳號登入 </div>
+                    <div style="display: flex; gap: 12px; justify-content: center;">
+                        <button class="social-login-btn" @click="socialLogin('google')" title="Google登入">
+                            <svg t="1763302211647" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                                <path
+                                    d="M213.333902 516.067556c0-33.536 5.603556-65.678222 15.616-95.829334L53.476124 287.431111A512 512 0 0 0 0.000569 516.067556c0 82.147556 19.2 159.630222 53.390222 228.408888l175.388445-133.006222a302.648889 302.648889 0 0 1-15.473778-95.402666"
+                                    fill="#FBBC05"></path>
+                                <path
+                                    d="M521.529458 211.143111c69.916444-0.142222 137.728 23.864889 192 67.982222l151.694222-150.129777C772.779236 49.294222 654.222791 0 521.529458 0 315.449458 0 138.297458 116.821333 53.476124 287.431111l175.587556 132.835556c40.419556-121.656889 155.676444-209.152 292.522667-209.152"
+                                    fill="#EA4335"></path>
+                                <path
+                                    d="M523.748124 814.193778c-137.528889 0-253.354667-86.926222-294.030222-207.815111l-176.355555 131.982222C138.581902 907.975111 316.587236 1024 523.748124 1024c127.800889 0 249.827556-44.458667 341.447112-127.800889l-167.452445-126.833778c-47.217778 29.155556-106.695111 44.856889-174.023111 44.856889"
+                                    fill="#34A853"></path>
+                                <path
+                                    d="M1024.000569 511.203556c0-30.321778-4.778667-62.976-11.918222-93.269334h-488.391111v198.144h281.116444c-14.023111 67.584-52.252444 119.495111-107.036444 153.287111l167.424 126.833778C961.422791 808.675556 1024.000569 678.371556 1024.000569 511.203556"
+                                    fill="#4285F4"></path>
+                            </svg>
+                        </button>
+                        <button class="social-login-btn" @click="startWeChatLogin" title="微信登入">
+                            <svg t="1763302238938" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                                xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                                <path
+                                    d="M704 397.92c-15.04-140.96-151.04-251.36-316.48-251.36-176 0-317.92 124.16-317.92 277.28a267.36 267.36 0 0 0 129.12 224c8.8 5.6-29.12 85.28-19.68 90.08s28.48-11.2 48.8-26.56 39.52-29.76 48-26.88a362.56 362.56 0 0 0 112 17.44 376.16 376.16 0 0 0 57.44-4.48c36.96 84.8 133.44 145.44 246.56 145.44a305.12 305.12 0 0 0 88.16-12.96c4.48-1.28 21.76 11.36 39.2 24.16s35.36 25.76 39.68 24c13.76-5.76-25.44-69.92-12.96-77.44 65.76-40.48 108.48-105.92 108.48-180-0.16-120-111.04-217.12-250.4-222.72z m-109.12 167.2a28 28 0 1 1 27.68-28 27.84 27.84 0 0 1-27.68 28z m-165.76 54.72a204.64 204.64 0 0 0 1.44 24.32 314.72 314.72 0 0 1-42.88 2.88 302.08 302.08 0 0 1-103.36-17.76c-3.2-1.12-14.4-4.64-20.48 0a265.28 265.28 0 0 0-32 32 142.4 142.4 0 0 0 8.96-38.4c1.12-10.24-14.56-17.6-17.76-19.68a220 220 0 0 1-98.08-178.4c0-122.88 117.6-222.4 262.72-222.4 135.36 0 246.88 86.72 260.96 198.24-124.48 17.44-219.52 108.96-219.52 219.2z m331.68-54.72a28 28 0 1 1 27.68-28 27.68 27.68 0 0 1-27.68 28z"
+                                    fill="#8DC81B"></path>
+                                <path
+                                    d="M498.24 286.08a41.92 41.92 0 1 0 41.44 41.92 41.76 41.76 0 0 0-41.44-41.92zM276.96 286.08a41.92 41.92 0 1 0 41.6 41.92 41.6 41.6 0 0 0-41.6-41.92z"
+                                    fill="#8DC81B"></path>
+                            </svg>
+                        </button>
+                        <button class="social-login-btn" @click="startLineLogin" title="Line登入">
+                            <svg t="1763302263551" class="icon" viewBox="0 0 1107 1024" version="1.1"
+                                xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                                <path
+                                    d="M553.967 0C248.01 0 0 195.231 0 436.04c0 223.685 214.083 407.92 489.757 433.017a33.708 33.708 0 0 1 22.512 14.705c12.237 20.145 3.542 63.069-5.96 111.197s42.169 23.149 53.6 17.576c9.1-4.415 243.31-136.444 382.742-265.921 101.963-79.1 165.25-189.02 165.25-310.558C1107.934 195.231 859.908 0 553.967 0zM369.311 550.157a29.545 29.545 0 0 1-29.78 29.276H238.257c-17.878 0-41.698-6.178-41.698-35.135v-216.55a29.528 29.528 0 0 1 29.78-29.277h5.959a29.528 29.528 0 0 1 29.78 29.276v187.275h77.438a29.545 29.545 0 0 1 29.796 29.276v5.859z m83.482-5.825a29.746 29.746 0 0 1-59.493 0V333.958a29.746 29.746 0 0 1 59.493 0v210.374z m262.01 0a32.92 32.92 0 0 1-29.78 29.276 33.708 33.708 0 0 1-35.102-16.787l-95.954-134.58v122.057a29.78 29.78 0 0 1-59.543 0V333.589a29.511 29.511 0 0 1 29.763-29.26 37.67 37.67 0 0 1 33.759 21.437c9.232 13.631 97.364 136.511 97.364 136.511V333.59a29.797 29.797 0 0 1 59.576 0v210.709z m178.696-134.614a29.276 29.276 0 1 1 0 58.552H816.06v46.819h77.438a29.276 29.276 0 1 1 0 58.536H777.35a26.557 26.557 0 0 1-26.859-26.322V330.702a26.557 26.557 0 0 1 26.86-26.339h116.148a29.276 29.276 0 1 1 0 58.536H816.06v46.835h77.438z"
+                                    fill="#00C300"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="toggle-mode">
+                    <a href="#" @click.prevent="toggleRegisterMode">
+                        {{ isRegister ? '已有帳號？去登入' : '沒有帳號？去註冊' }}
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showDeviceTrustModal" class="device-trust-modal">
+            <div class="device-trust-card" role="dialog" aria-modal="true" aria-label="信任设备">
+                <div class="device-trust-mark">🔐</div>
+                <h3 class="device-trust-title">信任此瀏覽器與電腦？</h3>
+                <p class="device-trust-desc">若信任此裝置，下次可免登入。若為公共電腦，請選擇臨時會話以保護隱私安全。</p>
+                <div class="device-trust-note">提醒：公共或共用電腦請勿選擇「信任此設備」。</div>
+                <div class="device-trust-actions">
+                    <button type="button" class="btn btn-primary" @click="confirmDeviceTrust(true)">信任此設備（免登入）</button>
+                    <button type="button" class="btn btn-secondary" @click="confirmDeviceTrust(false)">僅 3
+                        小時（自動登出）</button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showAuraModal" class="aura-overlay" :class="{active: showAuraModal, closing: auraClosing}"
+            @click.self="closeAuraModal">
+            <div class="aura-modal" @click.stop>
+                <div class="aura-header">
+                    <div class="aura-brand">
+                        <div class="shield-icon-wrapper">
+                            <div class="shield-pulse"></div>
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                            </svg>
+                        </div>
+                        <span>人机验证</span>
+                    </div>
+                    <button type="button" class="aura-close" @click="closeAuraModal" aria-label="关闭验证窗口">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+
+                <div class="aura-body">
+                    <div class="scan-state" :class="{hidden: auraState !== 'scanning'}">
+                        <div class="scan-circle"></div>
+                        <div class="scan-text">
+                            <span>{{ auraScanText }}</span>
+                            <div class="scan-dots"><span>.</span><span>.</span><span>.</span></div>
+                        </div>
+                    </div>
+
+                    <div id="aura-captcha-stage" :class="{visible: auraState !== 'scanning'}"></div>
+                </div>
+
+                <div class="aura-footer">
+                    <div class="security-status">
+                        <div class="status-dot" :class="{secure: auraState === 'passed'}"></div>
+                        <span>{{ auraRiskScore >= 0 ? ('风险分：' + auraRiskScore) : '娃娃团队_云域安全' }}</span>
+                    </div>
+                    <div v-if="auraState === 'captcha'">请完成验证后自动提交</div>
+                    <a v-else class="aura-help-link" href="https://security.wawacm.com/ldtj.php" target="_blank"
+                        rel="noopener noreferrer">无法使用验证码？</a>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showSocialBindModal" class="social-bind-modal" @click.self="showSocialBindModal = false">
+            <div class="social-bind-box">
+                <h3 class="social-bind-title">綁定社群帳號</h3>
+                <div class="social-bind-options">
+                    <div class="social-bind-item" @click="socialBind('google')"
+                        :style="user && user.google_user_id ? 'opacity:0.5;cursor:not-allowed;' : ''">
+                        <svg t="1763302211647" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                            xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                            <path
+                                d="M213.333902 516.067556c0-33.536 5.603556-65.678222 15.616-95.829334L53.476124 287.431111A512 512 0 0 0 0.000569 516.067556c0 82.147556 19.2 159.630222 53.390222 228.408888l175.388445-133.006222a302.648889 302.648889 0 0 1-15.473778-95.402666"
+                                fill="#FBBC05"></path>
+                            <path
+                                d="M521.529458 211.143111c69.916444-0.142222 137.728 23.864889 192 67.982222l151.694222-150.129777C772.779236 49.294222 654.222791 0 521.529458 0 315.449458 0 138.297458 116.821333 53.476124 287.431111l175.587556 132.835556c40.419556-121.656889 155.676444-209.152 292.522667-209.152"
+                                fill="#EA4335"></path>
+                            <path
+                                d="M523.748124 814.193778c-137.528889 0-253.354667-86.926222-294.030222-207.815111l-176.355555 131.982222C138.581902 907.975111 316.587236 1024 523.748124 1024c127.800889 0 249.827556-44.458667 341.447112-127.800889l-167.452445-126.833778c-47.217778 29.155556-106.695111 44.856889-174.023111 44.856889"
+                                fill="#34A853"></path>
+                            <path
+                                d="M1024.000569 511.203556c0-30.321778-4.778667-62.976-11.918222-93.269334h-488.391111v198.144h281.116444c-14.023111 67.584-52.252444 119.495111-107.036444 153.287111l167.424 126.833778C961.422791 808.675556 1024.000569 678.371556 1024.000569 511.203556"
+                                fill="#4285F4"></path>
+                        </svg>
+                        <span>Google</span>
+                        <span v-if="user && user.google_user_id"
+                            style="font-size:11px;color:#34c759;display:block;margin-top:2px;">已綁定</span>
+                    </div>
+                    <div class="social-bind-item" @click="startWeChatBind"
+                        :style="user && user.wx_user_id ? 'opacity:0.5;cursor:not-allowed;' : ''">
+                        <svg t="1763302238938" class="icon" viewBox="0 0 1024 1024" version="1.1"
+                            xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                            <path
+                                d="M704 397.92c-15.04-140.96-151.04-251.36-316.48-251.36-176 0-317.92 124.16-317.92 277.28a267.36 267.36 0 0 0 129.12 224c8.8 5.6-29.12 85.28-19.68 90.08s28.48-11.2 48.8-26.56 39.52-29.76 48-26.88a362.56 362.56 0 0 0 112 17.44 376.16 376.16 0 0 0 57.44-4.48c36.96 84.8 133.44 145.44 246.56 145.44a305.12 305.12 0 0 0 88.16-12.96c4.48-1.28 21.76 11.36 39.2 24.16s35.36 25.76 39.68 24c13.76-5.76-25.44-69.92-12.96-77.44 65.76-40.48 108.48-105.92 108.48-180-0.16-120-111.04-217.12-250.4-222.72z m-109.12 167.2a28 28 0 1 1 27.68-28 27.84 27.84 0 0 1-27.68 28z m-165.76 54.72a204.64 204.64 0 0 0 1.44 24.32 314.72 314.72 0 0 1-42.88 2.88 302.08 302.08 0 0 1-103.36-17.76c-3.2-1.12-14.4-4.64-20.48 0a265.28 265.28 0 0 0-32 32 142.4 142.4 0 0 0 8.96-38.4c1.12-10.24-14.56-17.6-17.76-19.68a220 220 0 0 1-98.08-178.4c0-122.88 117.6-222.4 262.72-222.4 135.36 0 246.88 86.72 260.96 198.24-124.48 17.44-219.52 108.96-219.52 219.2z m331.68-54.72a28 28 0 1 1 27.68-28 27.68 27.68 0 0 1-27.68 28z"
+                                fill="#8DC81B"></path>
+                            <path
+                                d="M498.24 286.08a41.92 41.92 0 1 0 41.44 41.92 41.76 41.76 0 0 0-41.44-41.92zM276.96 286.08a41.92 41.92 0 1 0 41.6 41.92 41.6 41.6 0 0 0-41.6-41.92z"
+                                fill="#8DC81B"></path>
+                        </svg>
+                        <span>微信</span>
+                        <span v-if="user && user.wx_user_id"
+                            style="font-size:11px;color:#34c759;display:block;margin-top:2px;">已綁定</span>
+                    </div>
+                    <div class="social-bind-item" @click="startLineBind"
+                        :style="user && user.line_user_id ? 'opacity:0.5;cursor:not-allowed;' : ''">
+                        <svg t="1763302263551" class="icon" viewBox="0 0 1107 1024" version="1.1"
+                            xmlns="http://www.w3.org/2000/svg" width="32" height="32">
+                            <path
+                                d="M553.967 0C248.01 0 0 195.231 0 436.04c0 223.685 214.083 407.92 489.757 433.017a33.708 33.708 0 0 1 22.512 14.705c12.237 20.145 3.542 63.069-5.96 111.197s42.169 23.149 53.6 17.576c9.1-4.415 243.31-136.444 382.742-265.921 101.963-79.1 165.25-189.02 165.25-310.558C1107.934 195.231 859.908 0 553.967 0zM369.311 550.157a29.545 29.545 0 0 1-29.78 29.276H238.257c-17.878 0-41.698-6.178-41.698-35.135v-216.55a29.528 29.528 0 0 1 29.78-29.277h5.959a29.528 29.528 0 0 1 29.78 29.276v187.275h77.438a29.545 29.545 0 0 1 29.796 29.276v5.859z m83.482-5.825a29.746 29.746 0 0 1-59.493 0V333.958a29.746 29.746 0 0 1 59.493 0v210.374z m262.01 0a32.92 32.92 0 0 1-29.78 29.276 33.708 33.708 0 0 1-35.102-16.787l-95.954-134.58v122.057a29.78 29.78 0 0 1-59.543 0V333.589a29.511 29.511 0 0 1 29.763-29.26 37.67 37.67 0 0 1 33.759 21.437c9.232 13.631 97.364 136.511 97.364 136.511V333.59a29.797 29.797 0 0 1 59.576 0v210.709z m178.696-134.614a29.276 29.276 0 1 1 0 58.552H816.06v46.819h77.438a29.276 29.276 0 1 1 0 58.536H777.35a26.557 26.557 0 0 1-26.859-26.322V330.702a26.557 26.557 0 0 1 26.86-26.339h116.148a29.276 29.276 0 1 1 0 58.536H816.06v46.835h77.438z"
+                                fill="#00C300"></path>
+                        </svg>
+                        <span>Line</span>
+                        <span v-if="user && user.line_user_id"
+                            style="font-size:11px;color:#34c759;display:block;margin-top:2px;">已綁定</span>
+                    </div>
+                </div>
+                <button class="btn btn-secondary btn-block" @click="showSocialBindModal = false"
+                    style="margin-top: 20px;">
+                    關閉
+                </button>
+            </div>
+        </div>
+
+        <div v-if="showLineBindModal" class="line-bind-modal" @click.self="closeLineBind">
+            <div class="line-bind-box">
+                <h3 style="margin-bottom: 20px;">{{ isLineLoginMode ? 'Line登入' : '綁定Line帳號' }}</h3>
+                <div
+                    style="margin-bottom: 16px; padding: 12px; background: rgba(0, 195, 0, 0.1); border-radius: 8px; color: var(--text); font-size: 14px; line-height: 1.5;">
+                    <strong>📱 操作步驟：</strong><br>
+                    1. 請關注官方Line帳號<br>
+                    2. 傳送以下驗證碼進行登入/綁定：<br>
+                    <strong
+                        style="color: #00C300; font-size: 24px; display: block; margin-top: 8px; letter-spacing: 3px;">{{ lineVerifyCode }}</strong>
+                    <div style="font-size: 12px; color: var(--text-secondary); margin-top: 6px;">
+                        ⏰ 有效期：{{ lineCodeExpiresAt || '60秒' }}
+                    </div>
+                </div>
+
+                <div class="line-qr-code">
+                    <img :src="lineQrCode" alt="Line二維碼" v-if="lineQrCode">
+                    <div v-else style="color: var(--text-secondary);">載入中...</div>
+                </div>
+                <div class="line-id">LineID: @082ofziz</div>
+                <div class="line-status" :class="lineBindStatus">
+                    <span v-if="lineBindStatus === 'waiting'">等待驗證中...</span>
+                    <span v-else-if="lineBindStatus === 'processing'">已在 LINE 端確認，正在安全登入...</span>
+                    <span v-else-if="lineBindStatus === 'success'">{{ isLineLoginMode ? '登入成功！' : '綁定成功！' }}</span>
+                    <span v-else>驗證失敗，請重試</span>
+                </div>
+                <div v-if="lineBindMessage" class="auth-progress-note" :class="{processing: lineBindStatus === 'processing'}">
+                    <div v-if="lineBindStatus === 'processing'" class="auth-progress-spinner"><span></span><span></span><span></span></div>
+                    <span>{{ lineBindMessage }}</span>
+                </div>
+                <button class="btn btn-secondary btn-block" @click="closeLineBind" style="margin-top: 20px;">
+                    關閉
+                </button>
+            </div>
+        </div>
+
+        <div v-if="showWeChatBindModal" class="line-bind-modal" @click.self="closeWeChatBind">
+            <div class="line-bind-box wechat-bind-box">
+                <h3 style="margin-bottom: 20px;">{{ isWeChatLoginMode ? '微信登入' : '綁定微信帳號' }}</h3>
+                <div
+                    style="margin-bottom: 16px; padding: 12px; background: rgba(124, 252, 0, 0.1); border-radius: 8px; color: var(--text); font-size: 14px; line-height: 1.5;">
+                    <strong>📱 操作步驟:</strong><br>
+                    1. 點擊下方按鈕{{ isMobileDevice ? '前往微信授權頁' : '開啟微信登入視窗' }}<br>
+                    2. 使用微信完成授權<br>
+                    3. 確認後自動完成{{ isWeChatLoginMode ? '登入' : '綁定' }}
+                </div>
+                <button class="btn btn-primary btn-block" @click="openWeChatPopup" style="margin-bottom: 12px;">
+                    {{ isMobileDevice ? '前往微信登入頁' : '開啟微信登入視窗' }}
+                </button>
+                <div class="line-status" :class="wechatBindStatus">
+                    <span v-if="wechatBindStatus === 'waiting'">等待微信掃碼...</span>
+                    <span v-else-if="wechatBindStatus === 'processing'">微信已確認，正在安全登入...</span>
+                    <span v-else-if="wechatBindStatus === 'success'">{{ isWeChatLoginMode ? '登入成功!' : '綁定成功!' }}</span>
+                    <span v-else>驗證失敗,請重試</span>
+                </div>
+                <div v-if="wechatBindMessage" class="auth-progress-note" :class="{processing: wechatBindStatus === 'processing'}">
+                    <div v-if="wechatBindStatus === 'processing'" class="auth-progress-spinner"><span></span><span></span><span></span></div>
+                    <span>{{ wechatBindMessage }}</span>
+                </div>
+                <button class="btn btn-secondary btn-block" @click="closeWeChatBind" style="margin-top: 20px;">
+                    關閉
+                </button>
+            </div>
+        </div>
+
+        <div v-if="showSocialAuthProgressModal" class="security-overlay social-auth-progress-overlay">
+            <div class="social-auth-progress-card" @click.stop>
+                <div class="social-auth-progress-eyebrow">{{ socialAuthProgressProvider || 'Secure Auth' }}</div>
+                <div class="social-auth-progress-spinner">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+                <h3>{{ socialAuthProgressTitle || '正在處理登入' }}</h3>
+                <p>{{ socialAuthProgressMessage || '正在同步帳號狀態與工作區，請稍候。' }}</p>
+            </div>
+        </div>
+
+        <div v-if="docViewerVisible" class="doc-viewer-overlay" @click.self="closeDocumentViewer">
+            <div class="doc-viewer-modal" @click.stop>
+                <div class="doc-viewer-header">
+                    <h3>{{ docViewerTitle }}</h3>
+                    <button class="btn-icon" @click="closeDocumentViewer" title="關閉">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <iframe class="doc-viewer-frame" :src="docViewerUrl"></iframe>
+                <div class="doc-viewer-actions">
+                    <button class="btn btn-primary"
+                        style="background: linear-gradient(135deg, var(--primary), var(--secondary)); color: #fff;"
+                        @click="openDocumentOriginal">
+                        下載原始檔案
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showHistoryModal" class="history-modal" @click="handleHistoryModalClick">
+            <div class="history-box">
+                <div class="history-header">
+                    <h3>📜 歷史版本</h3>
+                    <button class="history-close-btn" @click="closeHistoryModal" title="關閉">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                </div>
+                <div class="history-body">
+                    <div class="history-list">
+                        <div v-if="historyVersions.length === 0" class="history-empty">
+                            <div style="font-size: 14px; margin-bottom: 8px;">📝</div>
+                            <div>暫無歷史版本</div>
+                            <div style="font-size: 12px; margin-top: 4px; opacity: 0.7;">編輯並儲存後會自動記錄</div>
+                        </div>
+                        <div v-for="(ver, index) in historyVersions" :key="ver.timestamp" class="history-item"
+                            :class="{active: selectedHistoryIndex === index}" @click="selectHistoryVersion(index)">
+                            <div class="history-time">{{ formatDate(ver.timestamp) }}</div>
+                            <div class="history-meta">
+                                {{ index === 0 ? '✅ 最新儲存' : '🕒 歷史版本' }}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="history-diff-view">
+                        <div v-if="historyDiffHtml" v-html="historyDiffHtml"></div>
+                        <div v-else class="history-diff-placeholder">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                </path>
+                            </svg>
+                            <div>請選擇左側版本查看對比（歷史版本僅儲存本機）</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="history-footer">
+                    <button v-if="selectedHistoryIndex !== null" class="btn btn-primary" @click="restoreHistoryVersion">
+                        恢復此版本 </button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="shareModalShow" class="login-modal" @click.self="closeShareModal">
+            <div class="login-box" @click.stop>
+                <div class="login-header">
+                    <svg class="login-icon" width="64" height="64" viewBox="0 0 24 24" fill="none"
+                        stroke="url(#shareGradient)" stroke-width="2">
+                        <defs>
+                            <linearGradient id="shareGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#d39b5e" />
+                                <stop offset="50%" style="stop-color:#e0b46a" />
+                                <stop offset="100%" style="stop-color:#f4e1c6" />
+                            </linearGradient>
+                        </defs>
+                        <circle cx="18" cy="5" r="3"></circle>
+                        <circle cx="6" cy="12" r="3"></circle>
+                        <circle cx="18" cy="19" r="3"></circle>
+                        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                        <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                    </svg>
+                    <h2>{{ shareModalKind === 'folder' ? '分享資料夾' : '分享備忘錄' }}</h2>
+                </div>
+
+                <div v-if="shareModalLoading" class="share-modal-loading">
+                    <div class="share-modal-spinner" aria-hidden="true">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <h3>{{ shareModalKind === 'folder' ? '正在建立資料夾分享' : '正在建立備忘錄分享' }}</h3>
+                    <p>{{ shareModalStatusText || (shareModalKind === 'folder' ? '正在整理資料夾內容並產生可分享連結...' : '正在整理備忘錄並產生可分享連結...') }}</p>
+                </div>
+
+                <div v-else class="input-group">
+                    <div class="input-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                        </svg>
+                        分享連結
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="share-link" name="share-link" class="input-field" :value="shareLink"
+                            readonly style="flex: 1;">
+                        <button class="btn btn-primary" @click="copyShareLink" style="padding: 16px 24px;">
+                            複製
+                        </button>
+                    </div>
+                </div>
+
+                <div v-if="!shareModalLoading"
+                    style="margin-top: 20px; padding: 15px; background: #f5f7fa; border-radius: 8px; font-size: 13px; color: #666;">
+                    <p>💡 提示：</p>
+                    <ul style="margin-top: 10px; margin-left: 20px; line-height: 1.8;">
+                        <li>分享連結永久有效</li>
+                        <li>任何人透過連結都可以查看分享內容</li>
+                        <li>您可以隨時刪除內容使連結失效</li>
+                    </ul>
+                </div>
+
+                <button class="btn btn-secondary btn-block" @click="closeShareModal" style="margin-top: 20px;">
+                    關閉
+                </button>
+            </div>
+        </div>
+
+        <div v-if="colorPickerVisible" class="login-modal" @click.self="closeColorPicker">
+            <div class="login-box" @click.stop style="max-width: 320px;">
+                <div class="login-header">
+                    <h2>{{ colorPickerMode === 'text' ? '文字顏色' : '背景顏色' }}</h2>
+                </div>
+                <div class="input-group">
+                    <div class="input-label">選擇顏色</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <input type="color" id="color-picker" name="color-picker"
+                            :value="colorPickerMode === 'text' ? currentTextColor : currentBgColor"
+                            @input="updatePickerColor($event.target.value)"
+                            style="width: 60px; height: 40px; border: 1px solid #ddd; border-radius: 4px; cursor: pointer;">
+                        <input type="text" id="color-hex" name="color-hex"
+                            :value="colorPickerMode === 'text' ? currentTextColor : currentBgColor"
+                            @input="updatePickerColor($event.target.value)" class="input-field" placeholder="#000000"
+                            style="flex: 1;">
+                    </div>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: #f5f5f5; border-radius: 4px;">
+                    <div style="font-size: 12px; color: #666; margin-bottom: 5px;">預覽效果:</div>
+                    <div :style="{
+                        padding: '10px',
+                        background: colorPickerMode === 'text' ? 'white' : (colorPickerMode === 'back' ? (currentBgColor || '#ffff00') : 'white'),
+                        color: colorPickerMode === 'text' ? (currentTextColor || '#000000') : '#333',
+                        border: '1px solid #ddd',
+                        borderRadius: '4px'
+                    }">
+                        選中的文字將顯示為這個效果 </div>
+                </div>
+                <button class="btn btn-primary btn-block" @click="applyColorFromPicker" style="margin-top: 15px;">
+                    套用
+                </button>
+                <button class="btn btn-secondary btn-block" @click="closeColorPicker" style="margin-top: 10px;">
+                    取消
+                </button>
+            </div>
+        </div>
+
+        <div v-if="lockDialog.visible" class="login-modal" @click.self="closeLockDialog">
+            <div class="login-box" @click.stop>
+                <div class="login-header">
+                    <h2>{{ lockDialog.mode === 'unlock-view' ? '解鎖備忘錄' : '設定加密密碼' }}</h2>
+                </div>
+                <div class="input-group">
+                    <div class="input-label">解鎖密碼</div>
+                    <input type="password" id="lock-password" name="lock-password" class="input-field"
+                        v-model="lockDialog.password" placeholder="請輸入密碼" autocomplete="off">
+                </div>
+                <div class="input-group" v-if="lockDialog.mode === 'set'">
+                    <div class="input-label">確認密碼</div>
+                    <input type="password" id="lock-confirm" name="lock-confirm" class="input-field"
+                        v-model="lockDialog.confirm" placeholder="再次輸入密碼" autocomplete="off">
+                </div>
+                <button class="btn btn-primary btn-block" @click="submitLockDialog" :disabled="unlocking"
+                    style="margin-top: 10px;">
+                    {{ lockDialog.mode === 'unlock-view' ? (unlocking ? '解鎖中...' : '解鎖') : '儲存' }}
+                </button>
+                <button class="btn btn-secondary btn-block" @click="closeLockDialog" style="margin-top: 10px;">
+                    取消
+                </button>
+            </div>
+        </div>
+
+        <div v-if="showChangePasswordModal" class="login-modal" @click.self="closeChangePasswordModal">
+            <div class="login-box" @click.stop>
+                <div class="login-header">
+                    <h2>修改密碼</h2>
+                </div>
+                <div class="input-group">
+                    <div class="input-label">舊密碼</div>
+                    <input type="password" id="old-password" name="old-password" class="input-field"
+                        v-model="changePasswordForm.oldPassword" placeholder="請輸入舊密碼" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <div class="input-label">新密碼</div>
+                    <input type="password" id="new-password" name="new-password" class="input-field"
+                        v-model="changePasswordForm.newPassword" placeholder="請輸入新密碼（至少6位）" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <div class="input-label">確認新密碼</div>
+                    <input type="password" id="confirm-password" name="confirm-password" class="input-field"
+                        v-model="changePasswordForm.confirmPassword" placeholder="再次輸入新密碼" autocomplete="off">
+                </div>
+                <button class="btn btn-primary btn-block" @click="submitChangePassword" :disabled="changingPassword"
+                    style="margin-top: 10px;">
+                    {{ changingPassword ? '修改中...' : '確認修改' }}
+                </button>
+                <button class="btn btn-secondary btn-block" @click="closeChangePasswordModal" style="margin-top: 10px;">
+                    取消
+                </button>
+            </div>
+        </div>
+
+        <!-- LINE專用密碼彈窗 -->
+        <div v-if="showLinePasswordModal" class="login-modal" @click.self="closeLinePasswordModal">
+            <div class="login-box" @click.stop>
+                <div class="login-header">
+                    <h2>{{ user.has_line_password ? '修改LINE專用密碼' : '設定LINE專用密碼' }}</h2>
+                </div>
+                <div v-if="user.has_line_password" class="input-group">
+                    <div class="input-label">舊LINE密碼</div>
+                    <input type="password" class="input-field" v-model="linePasswordForm.oldPassword"
+                        placeholder="請輸入舊LINE專用密碼" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <div class="input-label">{{ user.has_line_password ? '新LINE密碼' : 'LINE專用密碼' }}</div>
+                    <input type="password" class="input-field" v-model="linePasswordForm.newPassword"
+                        placeholder="請輸入LINE專用密碼（至少4位）" autocomplete="off">
+                </div>
+                <div class="input-group">
+                    <div class="input-label">確認密碼</div>
+                    <input type="password" class="input-field" v-model="linePasswordForm.confirmPassword"
+                        placeholder="再次輸入LINE專用密碼" autocomplete="off">
+                </div>
+                <p style="font-size: 12px; color: #999; margin: 8px 0 0;">LINE專用密碼用於外部API對接驗證，與登入密碼獨立</p>
+                <button class="btn btn-primary btn-block" @click="submitLinePassword" :disabled="settingLinePassword"
+                    style="margin-top: 10px;">
+                    {{ settingLinePassword ? '設定中...' : '確認設定' }}
+                </button>
+                <button class="btn btn-secondary btn-block" @click="closeLinePasswordModal" style="margin-top: 10px;">
+                    取消
+                </button>
+            </div>
+        </div>
+
+        <div v-if="showCollaborateModalVisible" class="login-modal" @click.self="closeCollaborateModal">
+            <div class="login-box" @click.stop>
+                <div class="login-header">
+                    <svg class="login-icon" viewBox="0 0 24 24" fill="none" stroke="url(#collaborateGradient)"
+                        stroke-width="2">
+                        <defs>
+                            <linearGradient id="collaborateGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#d39b5e" />
+                                <stop offset="50%" style="stop-color:#e0b46a" />
+                                <stop offset="100%" style="stop-color:#f4e1c6" />
+                            </linearGradient>
+                        </defs>
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="8.5" cy="7" r="4"></circle>
+                        <path d="M20 8v6M23 11h-6"></path>
+                    </svg>
+                    <h2>共創編輯</h2>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path
+                                d="M512 589.44L36.096 180.48c2.56-0.576 4.864-1.664 7.488-1.664H980.48c1.6 0 4.992 1.152 7.552 1.6L512 589.44z m510.976-352.384v614.784c0 3.84-1.152 7.168-2.048 10.688l-337.92-348.544L1020.416 224c1.344 4.16 2.56 8.448 2.56 13.056zM3.584 223.936L341.12 513.984 3.2 862.528c-0.832-3.456-2.112-6.848-2.112-10.688V237.056c0-4.672 1.28-8.896 2.56-13.12z m646.528 328.896l340.736 351.36c-3.392 0.896-6.72 2.176-10.432 2.176H43.584c-3.584 0-6.912-1.28-10.24-2.176l340.672-351.36 124.352 106.88a20.672 20.672 0 0 0 27.264 0l124.48-106.88z">
+                            </path>
+                        </svg>
+                        對方信箱
+                    </div>
+                    <div style="display: flex; gap: 6px; align-items: center;">
+                        <input type="email" id="collaborate-email" name="collaborate-email" class="input-field"
+                            v-model="collaborateForm.email" placeholder="請輸入對方的信箱地址" style="flex: 1;">
+                        <select v-if="historyCollaborateMembers && historyCollaborateMembers.length > 0"
+                            id="history-member-select" name="history-member-select"
+                            @change="selectHistoryMember($event.target.value); $event.target.value = ''" title="選擇歷史成員"
+                            style="width: 42px; height: 42px; padding: 0; border: 1px solid #e5e5e5; border-radius: 8px; background: #fff url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%23666%22 stroke-width=%222%22><path d=%22M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2%22/><circle cx=%229%22 cy=%227%22 r=%224%22/><path d=%22M23 21v-2a4 4 0 0 0-3-3.87%22/><path d=%22M16 3.13a4 4 0 0 1 0 7.75%22/></svg>') center/20px no-repeat; cursor: pointer; appearance: none; -webkit-appearance: none;">
+                            <option value=""></option>
+                            <option v-for="member in historyCollaborateMembers" :key="member.email"
+                                :value="member.email">
+                                {{ member.username || member.email }}
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <div class="input-label">權限</div>
+                    <select id="collaborate-permission" name="collaborate-permission" class="input-field"
+                        v-model="collaborateForm.permission">
+                        <option value="view">僅查看</option>
+                        <option value="edit">可編輯</option>
+                    </select>
+                </div>
+
+                <div
+                    style="margin-top: 20px; padding: 15px; background: #f5f7fa; border-radius: 8px; font-size: 13px; color: #666;">
+                    <p>💡 提示：</p>
+                    <ul style="margin-top: 10px; margin-left: 20px; line-height: 1.8;">
+                        <li>輸入對方的註冊信箱</li>
+                        <li>對方登入後可在"與我共享"中看到此備忘錄</li>
+                        <li>您可以選擇對方是否可以編輯</li>
+                    </ul>
+                </div>
+
+                <div v-if="collaborateShares && collaborateShares.length > 0"
+                    style="margin-top: 20px; border-top: 1px solid #e5e5e5; padding-top: 20px;">
+                    <div style="font-size: 14px; font-weight: 500; color: #333; margin-bottom: 10px;">
+                        📋 已與以下使用者共享：
+                    </div>
+                    <div style="max-height: 200px; overflow-y: auto;">
+                        <div v-for="share in collaborateShares" :key="share.id"
+                            style="display: flex; align-items: center; justify-content: space-between; padding: 10px; background: #f9f9f9; border-radius: 6px; margin-bottom: 8px;">
+                            <div style="flex: 1;">
+                                <div style="font-size: 13px; color: #333; font-weight: 500;">
+                                    {{ share.shared_with_email || '公開連結' }}
+                                </div>
+                                <div style="font-size: 12px; color: #999; margin-top: 2px;">
+                                    權限：{{ share.permission === 'edit' ? '可編輯' : '僅查看' }} · {{ formatDate(share.created_at) }}
+                                </div>
+                            </div>
+                            <button v-if="share.shared_with_user_id" @click="revokeShare(share.id)"
+                                class="btn btn-danger"
+                                style="padding: 5px 12px; font-size: 12px; background: #ff4d4f; border: none; border-radius: 4px; color: white; cursor: pointer;">
+                                撤回
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="btn btn-primary btn-block" @click="submitCollaborate" :disabled="collaborating"
+                    style="margin-top: 20px;">
+                    {{ collaborating ? '分享中...' : '確認分享' }}
+                </button>
+                <button class="btn btn-secondary btn-block" @click="closeCollaborateModal" style="margin-top: 10px;">
+                    取消
+                </button>
+            </div>
+        </div>
+
+        <div v-if="docUploads.length" class="doc-upload-progress">
+            <div v-for="upload in docUploads" :key="upload.id" class="doc-upload-item">
+                <div class="doc-upload-header">
+                    <span class="doc-upload-name">{{ upload.name }}</span>
+                    <span>{{ getDocUploadStatus(upload) }}</span>
+                </div>
+                <div class="doc-upload-bar">
+                    <div class="doc-upload-bar-fill" :style="{
+                                width: Math.min(upload.progress, 100) + '%',
+                                background: upload.status === 'error' ? '#ff4d4f' : ''
+                              }"></div>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="contextMenu.show" class="context-menu"
+            :style="{left: contextMenu.x + 'px', top: contextMenu.y + 'px'}" @click.stop>
+
+            <div class="menu-item" @click.stop="showMoreMenu($event, contextMenu.memo)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="19" cy="12" r="1"></circle>
+                    <circle cx="5" cy="12" r="1"></circle>
+                </svg>
+                更多
+                <svg class="submenu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="margin-left: auto; width: 16px; height: 16px;">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </div>
+
+            <div class="menu-item" @click="toggleMemoComplete(contextMenu.memo)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M9 11l3 3L22 4"></path>
+                    <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                </svg>
+                {{ contextMenu.memo?.is_completed === 0 ? '標記已完成' : (contextMenu.memo?.is_completed === 1 ? '標記待完成' : '標記待完成') }}
+            </div>
+
+            <div class="menu-item has-submenu" @click.stop="showFolderSubMenu($event, contextMenu.memo)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                移動至文件夾
+                <svg class="submenu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="margin-left: auto; width: 16px; height: 16px;">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </div>
+
+            <div class="menu-item" @click="shareMemo(contextMenu.memo)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                分享
+            </div>
+
+            <div class="menu-item danger" @click="deleteMemo(contextMenu.memo)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                刪除
+            </div>
+        </div>
+
+        <!-- 文件夾子菜單 -->
+        <div v-if="folderContextMenu.show" class="context-menu"
+            :style="{left: folderContextMenu.x + 'px', top: folderContextMenu.y + 'px'}" @click.stop>
+            <div class="menu-item" @click="renameFolder(folderContextMenu.folder)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 20h9"></path>
+                    <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path>
+                </svg>
+                重新命名
+            </div>
+            <div class="menu-item" @click="shareFolder(folderContextMenu.folder)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                </svg>
+                分享文件夾
+            </div>
+            <div class="menu-item danger" @click="deleteFolder(folderContextMenu.folder)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polyline points="3 6 5 6 21 6"></polyline>
+                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                </svg>
+                刪除文件夾
+            </div>
+        </div>
+
+        <div v-if="folderMenuShow" class="context-menu theme-submenu"
+            :style="{left: folderMenuX + 'px', top: folderMenuY + 'px'}" @click.stop>
+            <div class="menu-item" @click="moveToFolder(contextMenu.memo, null)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                不分類
+            </div>
+            <div v-for="folder in folders" :key="folder.id" class="menu-item"
+                @click="moveToFolder(contextMenu.memo, folder.id)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                {{ folder.name }}
+            </div>
+            <div v-if="!folders.length" class="menu-item" style="opacity:0.5;pointer-events:none;">
+                暫無文件夾 </div>
+        </div>
+
+        <div v-if="moreMenuShow" class="context-menu theme-submenu"
+            :style="{left: moreMenuX + 'px', top: moreMenuY + 'px'}" @click.stop>
+
+            <div class="menu-item" @click="toggleMemoPin(contextMenu.memo)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2v20M7 7l5-5 5 5M7 17l5 5 5-5"></path>
+                </svg>
+                {{ contextMenu.memo?.is_pinned == 1 ? '取消置頂' : '置頂' }}
+            </div>
+
+            <div class="menu-item" @click="showCollaborateModal(contextMenu.memo)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="8.5" cy="7" r="4"></circle>
+                    <path d="M20 8v6M23 11h-6"></path>
+                </svg>
+                共創編輯
+            </div>
+
+            <div class="menu-item" style="flex-direction: column; align-items: flex-start; padding-bottom: 4px;">
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        style="width:18px;height:18px;flex-shrink:0;">
+                        <circle cx="12" cy="12" r="9"></circle>
+                        <path d="M12 3v18M3 12h18"></path>
+                    </svg>
+                    便條顏色
+                </div>
+                <div class="color-swatch-menu">
+                    <div class="color-swatch color-swatch-yellow"
+                        :class="{active: (contextMenu.memo && getMemoStableColor(contextMenu.memo)) === 'yellow'}"
+                        @click.stop="updateMemoColor(contextMenu.memo, 'yellow')" title="黃色"></div>
+                    <div class="color-swatch color-swatch-green"
+                        :class="{active: (contextMenu.memo && getMemoStableColor(contextMenu.memo)) === 'green'}"
+                        @click.stop="updateMemoColor(contextMenu.memo, 'green')" title="綠色"></div>
+                    <div class="color-swatch color-swatch-blue"
+                        :class="{active: (contextMenu.memo && getMemoStableColor(contextMenu.memo)) === 'blue'}"
+                        @click.stop="updateMemoColor(contextMenu.memo, 'blue')" title="藍色"></div>
+                    <div class="color-swatch color-swatch-pink"
+                        :class="{active: (contextMenu.memo && getMemoStableColor(contextMenu.memo)) === 'pink'}"
+                        @click.stop="updateMemoColor(contextMenu.memo, 'pink')" title="粉色"></div>
+                    <div class="color-swatch color-swatch-orange"
+                        :class="{active: (contextMenu.memo && getMemoStableColor(contextMenu.memo)) === 'orange'}"
+                        @click.stop="updateMemoColor(contextMenu.memo, 'orange')" title="橘色"></div>
+                    <div class="color-swatch color-swatch-purple"
+                        :class="{active: (contextMenu.memo && getMemoStableColor(contextMenu.memo)) === 'purple'}"
+                        @click.stop="updateMemoColor(contextMenu.memo, 'purple')" title="紫色"></div>
+                    <div class="color-swatch color-swatch-neutral"
+                        :class="{active: (contextMenu.memo && getMemoStableColor(contextMenu.memo)) === 'neutral'}"
+                        @click.stop="updateMemoColor(contextMenu.memo, 'neutral')" title="原色"></div>
+                </div>
+            </div>
+
+            <div class="menu-item" @click.stop="showThemeMenu($event, contextMenu.memo)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <path d="M9 3v18"></path>
+                </svg>
+                卡通背景 <svg class="submenu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="margin-left: auto; width: 16px; height: 16px;">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </div>
+
+
+            <div class="menu-item" @click.stop="showExportMenu($event, contextMenu.memo)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="7 10 12 15 17 10"></polyline>
+                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                </svg>
+                匯出備忘錄 <svg class="submenu-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    style="margin-left: auto; width: 16px; height: 16px;">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </div>
+        </div>
+
+        <div v-if="exportMenuShow" class="context-menu theme-submenu"
+            :style="{left: exportMenuX + 'px', top: exportMenuY + 'px'}" @click.stop>
+            <div class="menu-item" @click="exportMemo('pdf')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <path d="M9 13h6M9 17h3"></path>
+                </svg>
+                匯出為 PDF
+            </div>
+            <div class="menu-item" @click="exportMemo('docx')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                </svg>
+                匯出為 Word
+            </div>
+            <div class="menu-item" @click="exportMemo('txt')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="10" y1="12" x2="14" y2="12"></line>
+                    <line x1="10" y1="16" x2="14" y2="16"></line>
+                </svg>
+                匯出為 TXT
+            </div>
+        </div>
+
+        <div v-if="themeMenuShow" class="context-menu theme-submenu"
+            :style="{left: themeMenuX + 'px', top: themeMenuY + 'px'}" @click.stop>
+            <div class="menu-item" @click="updateMemoTheme(contextMenu.memo, 'chiikawa')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M8 14s1.5 2 4 2 4-2 4-2"></path>
+                    <line x1="9" y1="9" x2="9.01" y2="9"></line>
+                    <line x1="15" y1="9" x2="15.01" y2="9"></line>
+                </svg>
+                吉伊卡哇
+            </div>
+            <div class="menu-item" @click="updateMemoTheme(contextMenu.memo, 'doraemon')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <circle cx="12" cy="12" r="4"></circle>
+                </svg>
+                哆啦A夢
+            </div>
+            <div class="menu-item" @click="updateMemoTheme(contextMenu.memo, 'shinchan')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                蠟筆小新
+            </div>
+            <div class="menu-item" @click="updateMemoTheme(contextMenu.memo, 'none')">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+                無背景
+            </div>
+        </div>
+
+        <!-- 自定義確認彈窗 -->
+        <div v-if="customConfirm.visible" class="login-modal" @click.self="handleCustomCancel">
+            <div class="login-box" @click.stop style="max-width: 400px;">
+                <div class="login-header">
+                    <h2>{{ customConfirm.title }}</h2>
+                </div>
+                <div
+                    style="padding: 0 0 20px; font-size: 15px; line-height: 1.6; color: var(--text); white-space: pre-line;">
+                    {{ customConfirm.message }}
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" @click="handleCustomCancel" style="flex: 1;">
+                        {{ customConfirm.cancelText }}
+                    </button>
+                    <button class="btn btn-primary" @click="handleCustomConfirm"
+                        style="flex: 1; background: linear-gradient(135deg, #ff4d4f, #ff7875); border: none; color: #fff;">
+                        {{ customConfirm.confirmText }}
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 账户安全中心 -->
+        <div v-if="showAccountSecurityModal" class="security-overlay" @click.self="closeAccountSecurityModalView">
+            <div class="security-center-modal" @click.stop>
+                <div class="security-center-hero">
+                    <div class="security-center-glow"></div>
+                    <div class="security-center-topline">
+                        <span class="security-chip">Account Security</span>
+                        <span class="security-chip"
+                            v-if="securityOverview && securityOverview.enhanced_security_enabled">Enhanced On</span>
+                    </div>
+                    <div class="security-center-headline">账户安全中心</div>
+                    <div class="security-center-subtitle">统一管理信任设备、LINE 安全、MFA、增强安全与全设备登录活动。</div>
+                    <button type="button" class="security-close-btn" @click="closeAccountSecurityModalView"><span
+                            class="material-symbols-outlined">close</span></button>
+                </div>
+                <div class="security-center-body" v-if="securityOverview">
+                    <div class="security-center-grid">
+                        <div class="security-card security-card-wide">
+                            <div class="security-card-icon"><span class="material-symbols-outlined">shield_lock</span>
+                            </div>
+                            <div class="security-card-title">LINE 安全</div>
+                            <div class="security-card-desc">修改 / 启用 LINE 专用密码，并确认 LINE 账号绑定状态。</div>
+                            <div class="security-badges">
+                                <span class="security-badge" :class="{'is-active': securityOverview.line_bound}">{{ securityOverview.line_bound ? 'LINE 已绑定' : '未绑定 LINE' }}</span>
+                                <span class="security-badge"
+                                    :class="{'is-active': securityOverview.line_password_enabled}">{{ securityOverview.line_password_enabled ? '专用密码已启用' : '专用密码未启用' }}</span>
+                            </div>
+                            <button class="security-action-btn" @click="openLineSecurityView">{{ securityOverview.line_bound ? (securityOverview.line_password_enabled ? '修改 LINE 专用密码' : '启用 LINE 专用密码') : '绑定 LINE 账号' }}</button>
+                        </div>
+                        <div class="security-card">
+                            <div class="security-card-icon"><span class="material-symbols-outlined">password</span>
+                            </div>
+                            <div class="security-card-title">登录密码</div>
+                            <div class="security-card-desc">修改当前账号的网页登录密码。</div>
+                            <button class="security-action-btn security-action-btn-secondary"
+                                @click="openChangePasswordView">修改登录密码</button>
+                        </div>
+                        <div class="security-card">
+                            <div class="security-card-icon"><span class="material-symbols-outlined">smartphone</span>
+                            </div>
+                            <div class="security-card-title">MFA 验证器</div>
+                            <div class="security-card-desc">绑定认证器后，可在登录或空闲锁定时输入 6 位验证码完成验证。</div>
+                            <div class="security-badges">
+                                <span class="security-badge" :class="{'is-active': securityOverview.mfa_enabled}">{{ securityOverview.mfa_enabled ? 'MFA 已绑定' : 'MFA 未绑定' }}</span>
+                            </div>
+                            <button class="security-action-btn" @click="openMfaSetupModalView">{{ securityOverview.mfa_enabled ? '重新绑定 MFA' : '立即绑定 MFA' }}</button>
+                        </div>
+                        <div class="security-card security-card-wide">
+                            <div class="security-card-icon"><span class="material-symbols-outlined">devices</span></div>
+                            <div class="security-card-title">当前会话信任</div>
+                            <div class="security-card-desc">信任当前会话可跳过空闲锁定；Passkey 绑定在下方单独管理。</div>
+                            <label class="trust-device-toggle">
+                                <input type="checkbox"
+                                    :checked="(securityOverview && securityOverview.current_device_trusted) || (getAuthSessionPolicy() && getAuthSessionPolicy().mode === 'trusted')"
+                                    @change="toggleCurrentDeviceTrustView($event.target.checked)"
+                                    :disabled="updatingTrustDevice">
+                                <span class="trust-device-toggle-ui"></span>
+                                <span class="trust-device-toggle-text">{{ ((securityOverview && securityOverview.current_device_trusted) || (getAuthSessionPolicy() && getAuthSessionPolicy().mode === 'trusted')) ? '当前设备已信任' : '当前设备未信任' }}</span>
+                            </label>
+                            <div class="security-inline-note">若关闭信任设备，当前会话会切换为临时会话，并保留自动过期策略。</div>
+                        </div>
+                        <div class="security-card security-card-wide">
+                            <div class="security-card-icon"><span class="material-symbols-outlined">devices</span></div>
+                            <div class="security-card-title">Passkey 可信设备（{{ (securityOverview.passkeys || []).length }} / 3）</div>
+                            <div class="security-card-desc">通过指纹、面容或设备 PIN 绑定和验证。每个账号最多保存 3 个 Passkey；移除后，该凭据将不能用于增强登录验证。</div>
+                            <div class="security-inline-note">部分系统会同步 Passkey，绑定数量按凭据计数。请保留 LINE 或 MFA 作为备用验证方式。</div>
+                            <div v-if="!passkeySupported" class="security-inline-note">当前浏览器不支持 Passkey，请使用支持的浏览器通过 HTTPS 打开本站。</div>
+                            <label class="input-group">
+                                <span class="input-label">设备名称</span>
+                                <input type="text" class="input-field" v-model="passkeyDeviceName" maxlength="100" placeholder="例如：我的 MacBook" :disabled="passkeyBusy">
+                            </label>
+                            <button class="security-action-btn" @click="registerPasskeyView" :disabled="passkeyBusy || togglingEnhancedSecurity || !passkeySupported || (securityOverview.passkeys || []).length >= 3">{{ passkeyBusy ? '处理中...' : '绑定 Passkey 可信设备' }}</button>
+                            <div v-for="device in (securityOverview.passkeys || [])" :key="device.id" class="passkey-device-row">
+                                <div><strong>{{ device.device_name }}</strong><div class="security-inline-note">绑定：{{ device.created_at }} · 最近使用：{{ device.last_used_at || '尚未使用' }}</div></div>
+                                <button class="security-action-btn security-action-btn-secondary" @click="removePasskeyView(device)" :disabled="passkeyBusy || togglingEnhancedSecurity">移除</button>
+                            </div>
+                        </div>
+                        <div class="security-card security-card-wide security-card-enhanced">
+                            <div class="security-card-icon"><span class="material-symbols-outlined">verified_user</span></div>
+                            <div class="security-card-title">增强账户安全</div>
+                            <div class="security-card-desc">可同时选择多种方式。登录时任选一种已勾选方式完成验证；非信任会话 10 分钟无操作也会重新验证。</div>
+                            <div class="security-method-choices">
+                                <label class="security-method-choice"><input type="checkbox" v-model="securityMethodsSelection" value="line" :disabled="!securityOverview.line_bound && !securityMethodsSelection.includes('line')"><span>LINE 增强 · {{ securityOverview.line_bound ? '已绑定' : '请先绑定 LINE' }}</span></label>
+                                <label class="security-method-choice"><input type="checkbox" v-model="securityMethodsSelection" value="mfa" :disabled="!securityOverview.mfa_enabled && !securityMethodsSelection.includes('mfa')"><span>MFA 增强 · {{ securityOverview.mfa_enabled ? '已绑定' : '请先绑定 MFA' }}</span></label>
+                                <label class="security-method-choice"><input type="checkbox" v-model="securityMethodsSelection" value="passkey" :disabled="!(securityOverview.passkeys || []).length && !securityMethodsSelection.includes('passkey')"><span>设备增强（Passkey）· {{ (securityOverview.passkeys || []).length ? '已绑定' : '请先绑定可信设备' }}</span></label>
+                            </div>
+                            <label class="enhanced-security-switch">
+                                <input type="checkbox" v-model="securityEnhancedEnabled" :disabled="togglingEnhancedSecurity || passkeyBusy">
+                                <span class="enhanced-security-slider"></span>
+                                <span class="enhanced-security-label">{{ securityEnhancedEnabled ? '开启增强安全' : '关闭增强安全' }}</span>
+                            </label>
+                            <button class="security-action-btn" @click="toggleEnhancedSecurityView(securityEnhancedEnabled)" :disabled="togglingEnhancedSecurity || passkeyBusy">{{ togglingEnhancedSecurity ? '保存中...' : '保存安全选项' }}</button>
+                            <div class="security-inline-note">开启时至少选择一种已绑定方式。点击保存后生效，未勾选方式不会用于登录验证。</div>
+                        </div>
+                        <div class="security-card security-card-wide">
+                            <div class="security-card-icon"><span class="material-symbols-outlined">history</span></div>
+                            <div class="security-card-title">登录活动</div>
+                            <div class="security-card-desc">查看所有设备的浏览器、设备、IP 与位置，并支持逐个设备登出。</div>
+                            <button class="security-action-btn" @click="openLoginActivityModalView">查看登录活动</button>
+                        </div>
+                    </div>
+                </div>
+                <div v-else class="security-center-loading">
+                    <div class="security-loader-ring"></div>
+                    <div>正在加载账户安全信息...</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MFA 绑定弹窗 -->
+        <!-- 安全设置操作确认 -->
+        <dialog v-if="showSecurityChangeModal" ref="securityChangeDialog" class="security-overlay security-change-overlay"
+            aria-labelledby="security-change-title" aria-describedby="security-change-description" :aria-busy="securityChangeSubmitting"
+            @click.self="closeSecurityChangeModalView" @cancel.prevent="closeSecurityChangeModalView" @keydown.escape.stop>
+            <div class="mfa-setup-modal" @click.stop>
+                <div class="mfa-setup-header">
+                    <h3 id="security-change-title">确认安全设置</h3>
+                    <button type="button" class="security-close-btn" aria-label="取消安全设置操作" @click="closeSecurityChangeModalView" :disabled="securityChangeSubmitting">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <form class="mfa-setup-body" @submit.prevent="submitSecurityChangeView">
+                    <p id="security-change-description" class="security-card-desc">{{ securityChangeDescription }}</p>
+                    <p class="security-inline-note">{{ securityOverview && securityOverview.mfa_enabled ? '请输入登录密码或 MFA 验证码确认身份。' : '请输入登录密码确认身份。' }}最近 5 分钟完成过增强验证可免填，直接确认。</p>
+                    <label class="input-group">
+                        <span class="input-label">登录密码</span>
+                        <input ref="securityChangePasswordInput" type="password" class="input-field" v-model="securityChangePassword" autocomplete="current-password" placeholder="请输入登录密码" :disabled="securityChangeSubmitting">
+                    </label>
+                    <label class="input-group" v-if="securityOverview && securityOverview.mfa_enabled">
+                        <span class="input-label">MFA 验证码（与登录密码任选其一）</span>
+                        <input type="text" class="input-field" v-model="securityChangeMfaCode" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="6 位 MFA 验证码" :disabled="securityChangeSubmitting">
+                    </label>
+                    <div v-if="securityChangeError" class="security-challenge-error" role="alert">{{ securityChangeError }}</div>
+                    <div class="security-change-actions">
+                        <button type="button" class="security-action-btn security-action-btn-secondary" @click="closeSecurityChangeModalView" :disabled="securityChangeSubmitting">取消</button>
+                        <button type="submit" class="security-action-btn" :disabled="securityChangeSubmitting">{{ securityChangeSubmitting ? '处理中...' : '确认并继续' }}</button>
+                    </div>
+                </form>
+            </div>
+        </dialog>
+
+        <div v-if="showMfaSetupModal" class="security-overlay" @click.self="closeMfaSetupModalView">
+            <div class="mfa-setup-modal" @click.stop>
+                <div class="mfa-setup-header">
+                    <div>
+                        <div class="mfa-setup-eyebrow">Authenticator Setup</div>
+                        <h3>绑定 MFA 验证器</h3>
+                    </div>
+                    <button type="button" class="security-close-btn" @click="closeMfaSetupModalView"><span
+                            class="material-symbols-outlined">close</span></button>
+                </div>
+                <div v-if="loadingMfaSetup" class="security-center-loading">
+                    <div class="security-loader-ring"></div>
+                    <div>正在生成 MFA 二维码...</div>
+                </div>
+                <div v-else class="mfa-setup-body">
+                    <div class="mfa-setup-qr-wrap"><img :src="mfaSetupData.qrUrl" alt="MFA QR Code" class="mfa-setup-qr"
+                            v-if="mfaSetupData.qrUrl"></div>
+                    <div class="mfa-secret-box">
+                        <div class="mfa-secret-label">手动输入密钥</div>
+                        <div class="mfa-secret-value">{{ mfaSetupData.secret || '---' }}</div>
+                    </div>
+                    <div class="input-group">
+                        <div class="input-label">6 位 MFA 验证码</div>
+                        <input type="text" class="input-field" v-model="mfaSetupForm.code" maxlength="6"
+                            placeholder="请输入认证器中的 6 位验证码">
+                    </div>
+                    <button class="btn btn-primary btn-block" @click="submitMfaSetupView"
+                        :disabled="verifyingMfaSetup">{{ verifyingMfaSetup ? '验证中...' : '确认绑定 MFA' }}</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 安全验证挑战弹窗 -->
+        <div v-if="showSecurityChallengeModal" class="security-overlay security-challenge-overlay"
+            @click.self="securityChallengeContext === 'login' && cancelSecurityChallengeView()">
+            <div class="security-challenge-modal" @click.stop>
+                <div class="security-challenge-header">
+                    <div>
+                        <div class="security-challenge-eyebrow">{{ securityChallengeContext === 'reauth' ? 'Session Re-Verification' : 'Secure Sign In' }}</div>
+                        <h3>{{ securityChallengeContext === 'reauth' ? '请完成二次验证后继续使用' : '登录成功，还差最后一步验证' }}</h3>
+                        <p>{{ securityChallengeContext === 'reauth' ? '当前会话因长时间无操作已锁定。' : '为了保护账户安全，请完成增强安全验证。' }}</p>
+                    </div>
+                    <button v-if="securityChallengeContext === 'login'" type="button" class="security-close-btn"
+                        @click="cancelSecurityChallengeView"><span
+                            class="material-symbols-outlined">close</span></button>
+                </div>
+                <div class="security-method-tabs" v-if="securityChallengeData">
+                    <button v-if="securityChallengeData.allowed_methods.includes('line_code')" type="button"
+                        class="security-method-tab" :class="{active: securityChallengeMethod === 'line_code'}"
+                        @click="securityChallengeMethod = 'line_code'">LINE 验证码</button>
+                    <button v-if="securityChallengeData.allowed_methods.includes('line_password')" type="button"
+                        class="security-method-tab" :class="{active: securityChallengeMethod === 'line_password'}"
+                        @click="securityChallengeMethod = 'line_password'">LINE 专用密码</button>
+                    <button v-if="securityChallengeData.allowed_methods.includes('mfa')" type="button"
+                        class="security-method-tab" :class="{active: securityChallengeMethod === 'mfa'}"
+                        @click="securityChallengeMethod = 'mfa'">MFA 验证码</button>
+                    <button v-if="securityChallengeData.allowed_methods.includes('passkey')" type="button" class="security-method-tab" :class="{active: securityChallengeMethod === 'passkey'}" @click="securityChallengeMethod = 'passkey'">Passkey 设备验证</button>
+                </div>
+                <div class="security-challenge-body" v-if="securityChallengeData">
+                    <div v-if="securityChallengeMethod === 'line_code'" class="line-challenge-panel">
+                        <div class="line-challenge-code">{{ securityChallengeData.line_code || '----' }}</div>
+                        <div class="line-challenge-copy">请在 LINE 中发送上方 4 位验证码完成验证</div>
+                        <div class="line-challenge-expire">有效期至：{{ securityChallengeData.line_code_expires_at || '生成中...' }}</div>
+                        <div class="line-challenge-orbit"><span></span><span></span><span></span></div>
+                        <div v-if="securityChallengeStatus === 'processing'" class="auth-progress-note processing">
+                            <div class="auth-progress-spinner"><span></span><span></span><span></span></div>
+                            <span>LINE 已确认，正在验证中...</span>
+                        </div>
+                        <button class="security-action-btn security-action-btn-secondary"
+                            @click="refreshSecurityChallengeLineView">刷新 LINE 验证码</button>
+                    </div>
+                    <div v-if="securityChallengeMethod === 'line_password'" class="line-password-panel">
+                        <div class="input-group">
+                            <div class="input-label">LINE 专用密码</div>
+                            <input type="password" class="input-field" v-model="securityChallengeForm.linePassword"
+                                placeholder="请输入你设置的 LINE 专用密码">
+                        </div>
+                        <button class="btn btn-primary btn-block" @click="submitSecurityChallengeLinePasswordView"
+                            :disabled="securityChallengeSubmitting">{{ securityChallengeSubmitting ? '验证中...' : '确认 LINE 专用密码' }}</button>
+                    </div>
+                    <div v-if="securityChallengeMethod === 'mfa'" class="mfa-challenge-panel">
+                        <div class="input-group">
+                            <div class="input-label">MFA 验证码</div>
+                            <input type="text" class="input-field" v-model="securityChallengeForm.mfaCode" maxlength="6"
+                                placeholder="请输入 6 位 MFA 验证码">
+                        </div>
+                        <button class="btn btn-primary btn-block" @click="submitSecurityChallengeMfaView"
+                            :disabled="securityChallengeSubmitting">{{ securityChallengeSubmitting ? '验证中...' : '确认 MFA 验证码' }}</button>
+                    </div>
+                    <div v-if="securityChallengeMethod === 'passkey'" class="passkey-challenge-panel">
+                        <p>使用已绑定 Passkey 的指纹、面容或设备 PIN 完成验证。</p>
+                        <button class="btn btn-primary btn-block" @click="submitSecurityChallengePasskeyView" :disabled="securityChallengeSubmitting">{{ securityChallengeSubmitting ? '正在验证...' : '使用 Passkey 验证' }}</button>
+                    </div>
+                    <div class="security-challenge-trust">
+                        <label class="trust-device-toggle security-challenge-trust-toggle">
+                            <input type="checkbox" v-model="securityChallengeForm.trustDevice">
+                            <span class="trust-device-toggle-ui"></span>
+                            <span class="trust-device-toggle-text">我完全信任此设备</span>
+                        </label>
+                        <div class="security-inline-note security-challenge-trust-note">
+                            勾选后，此设备不再触发 10 分钟无操作二次验证，但每次登录仍需完成增强安全验证。
+                        </div>
+                    </div>
+                    <div v-if="securityChallengeError" class="security-challenge-error">{{ securityChallengeError }}
+                    </div>
+                </div>
+                <div class="security-challenge-footer" v-if="securityChallengeContext === 'reauth'">
+                    <button class="btn btn-secondary btn-block" @click="logout">退出登录</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 登录活动弹窗 -->
+        <div v-if="showLoginActivityModal" class="security-overlay" @click.self="closeLoginActivityModalView">
+            <div class="login-activity-modal" @click.stop>
+                <div class="login-activity-header">
+                    <div>
+                        <div class="login-activity-eyebrow">Session Timeline</div>
+                        <h3>登录活动</h3>
+                        <p>默认只记录 IP、浏览器、系统与时间。打开这里后，位置会从上到下逐个查询并缓存到数据库。</p>
+                    </div>
+                    <button type="button" class="security-close-btn" @click="closeLoginActivityModalView"><span
+                            class="material-symbols-outlined">close</span></button>
+                </div>
+                <div v-if="loadingLoginActivities" class="login-activity-loading">
+                    <div class="activity-loader-lane"><span></span><span></span><span></span></div>
+                    <div>正在加载设备会话，并依次查询地址...</div>
+                </div>
+                <div v-else class="login-activity-list">
+                    <div v-for="activity in loginActivities" :key="activity.id" class="login-activity-item">
+                        <div class="login-activity-main">
+                            <div class="login-activity-title-row">
+                                <div class="login-activity-title">{{ activity.browser_name || '未知浏览器' }} · {{ activity.os_name || '未知系统' }}</div>
+                                <div class="login-activity-tags">
+                                    <span class="security-badge is-active" v-if="activity.is_current">当前设备</span>
+                                    <span class="security-badge is-active" v-if="activity.is_trusted_device">信任设备</span>
+                                    <span class="security-badge">{{ activity.login_method || 'password' }}</span>
+                                </div>
+                            </div>
+                            <div class="login-activity-meta">{{ activity.device_label || '未知设备' }}</div>
+                            <div class="login-activity-meta">IP：{{ activity.ip_address || '未记录' }}</div>
+                            <div class="login-activity-meta">登录时间：{{ activity.created_at || '未知' }}</div>
+                            <div class="login-activity-meta">最近活动：{{ activity.last_used_at || activity.created_at || '未知' }}</div>
+                            <div class="login-activity-location"
+                                :class="{'is-loading': loginActivityResolvingIds.includes(activity.id)}">
+                                <span class="material-symbols-outlined">location_on</span>
+                                <span>{{ activity.location || (loginActivityResolvingIds.includes(activity.id) ? '正在逐个查询地址...' : '等待查询地址') }}</span>
+                            </div>
+                        </div>
+                        <button class="login-activity-logout-btn" @click="logoutLoginActivityView(activity)"
+                            :disabled="loginActivityLoggingOutIds.includes(activity.id)">{{ loginActivityLoggingOutIds.includes(activity.id) ? '处理中...' : '登出' }}</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script defer src="https://newcdnjs.wawacm.com/memo/releases/ab0ee0563b8d0ce2/assets/vendor/vue-3.5.43/vue.global.prod.js"></script>
+    <script defer src="https://newcdnjs.wawacm.com/memo/releases/ab0ee0563b8d0ce2/assets/js/workspace.bundle.js?v=33d037073f30"></script>
+
+
+    <div class="chat-hidden" id="chat-window">
+        <div class="chat-header">
+            <div class="chat-title">
+                <span class="material-symbols-outlined">smart_toy</span>
+                <span>娃娃AI小幫手</span>
+            </div>
+            <div style="display: flex; gap: 4px;">
+                <button class="chat-close" onclick="startNewAISession()" title="開啟新對話">
+                    <span class="material-symbols-outlined">add</span>
+                </button>
+                <button class="chat-close" onclick="hideAIBot()" title="暫時關閉浮窗（重新整理後恢復）">
+                    <span class="material-symbols-outlined">visibility_off</span>
+                </button>
+                <button class="chat-close" onclick="toggleBot()">
+                    <span class="material-symbols-outlined">close</span>
+                </button>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="messages">
+            <div class="chat-message ai">
+                <div class="bubble-ai">
+                    嘿！我是娃娃AI 👋<br>有什麼可以幫你的嗎？
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <form onsubmit="handleSend(event)">
+                <div id="user-input" class="user-input-editable" contenteditable="true" placeholder="輸入訊息..."
+                    data-placeholder="輸入訊息..."></div>
+                <button type="submit">
+                    <span class="material-symbols-outlined">send</span>
+                </button>
+            </form>
+
+            <div class="chat-quick-actions">
+                <button class="chat-quick-btn chat-quick-btn-optimize" onclick="quickAction('幫我優化這段內容，使其更通順專業')">
+                    <span class="material-symbols-outlined">auto_fix_high</span>
+                    <span>幫我優化</span>
+                </button>
+                <button class="chat-quick-btn chat-quick-btn-concise" onclick="quickAction('幫我精簡這段內容，保留核心觀點')">
+                    <span class="material-symbols-outlined">short_text</span>
+                    <span>幫我精簡</span>
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="wawa-container group">
+        <div id="tooltip" style="opacity: 1;">
+            <span class="animate-point">👉</span> 我來幫你解決困難
+        </div>
+
+        <canvas class="state-peeking" height="400" id="wawa-canvas" onclick="toggleBot()" width="400"></canvas>
+    </div>
+
+    <script defer src="https://newcdnjs.wawacm.com/memo/releases/ab0ee0563b8d0ce2/assets/js/ai-bot.js?v=20260301-task-context-01"></script>
+</body>
+
+</html>
