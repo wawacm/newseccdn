@@ -1,8 +1,8 @@
 {
   "repository": "wawacm/newseccdn",
   "baseUrl": "https://newcdnjs.wawacm.com/memo",
-  "release": "80f30607b36341ab",
-  "releaseUrl": "https://newcdnjs.wawacm.com/memo/releases/80f30607b36341ab",
+  "release": "956c3db85ddacd21",
+  "releaseUrl": "https://newcdnjs.wawacm.com/memo/releases/956c3db85ddacd21",
   "compression": "Whitespace/comments only; no JS variable renaming or aggressive transforms; image/font binaries unchanged.",
   "files": [
     {
@@ -51,7 +51,7 @@
       "path": "assets/css/main-new.css",
       "bytes": 90354,
       "originalBytes": 113056,
-      "sha256": "eacc9bf179eef2d6b10c4bb8a2ef5fb6d9e8ab6f407f369e837a6a347290e0d9"
+      "sha256": "77956051d9ab14b5dfdacc2c297a1f62e606f7bb3132e5a96c3490a1749c0c3a"
     },
     {
       "path": "assets/css/main.css",
@@ -93,7 +93,7 @@
       "path": "assets/css/share-page-new.css",
       "bytes": 3210,
       "originalBytes": 4097,
-      "sha256": "86bf105dca8108c008f154c797962c931eb6ef44496cfc32119e5ccd381deefb"
+      "sha256": "ca55e17b7b8d356a95da8201a519d376f41e18f9981dac0fa6b4b966361e337e"
     },
     {
       "path": "assets/css/share-page.css",
@@ -211,9 +211,9 @@
     },
     {
       "path": "assets/js/app.js",
-      "bytes": 109583,
-      "originalBytes": 177583,
-      "sha256": "143629343d6f9b412afebddff041c0a7bb5de42944a0365903faf4825922bd3a"
+      "bytes": 109582,
+      "originalBytes": 177582,
+      "sha256": "a13d433eefce374125b1d7e246be82e3608ae1df931ed038d15237d8fa1e7c12"
     },
     {
       "path": "assets/js/config.js",
@@ -259,9 +259,9 @@
     },
     {
       "path": "assets/js/modules/auth.js",
-      "bytes": 18510,
-      "originalBytes": 29263,
-      "sha256": "83d4acbb01e3b4ab93e6256c0111cfa2f8f783dfb0e2574031f41112058fd1e3"
+      "bytes": 19767,
+      "originalBytes": 30703,
+      "sha256": "52f933dcbca93dea7b914f62869a1210bba8de74427b1afc61f2920aac4d5f44"
     },
     {
       "path": "assets/js/modules/batch-operation-module.js",
@@ -339,7 +339,7 @@
       "path": "assets/js/modules/export-module.js",
       "bytes": 8761,
       "originalBytes": 17118,
-      "sha256": "277e5eee3f35bdc3f6b3246ddef8c7616f1379c24e1b95d502ea23a9c1b85507"
+      "sha256": "8c61b31c71dcf1f8d57c486cbdf53701384c70869a0376c7ef5e16e9c425ebcf"
     },
     {
       "path": "assets/js/modules/formatting.js",
@@ -435,7 +435,7 @@
       "path": "assets/js/modules/security-module.js",
       "bytes": 27313,
       "originalBytes": 39066,
-      "sha256": "f305be84cb49ebef09530273235dfbbe9465020b83e4fa3b05a9fa7da4754e6f"
+      "sha256": "2d43a8bdb6847fb7a41f5600a993e3982e2f78767a2b5f7a977f4daa1e54445b"
     },
     {
       "path": "assets/js/modules/share-module.js",
@@ -517,9 +517,9 @@
     },
     {
       "path": "assets/js/workspace.bundle.js",
-      "bytes": 439724,
-      "originalBytes": 714403,
-      "sha256": "c795a335f8a7cc7ed642f55612cb308dfeb26d04f823dbd6c17f44674689e96b"
+      "bytes": 440980,
+      "originalBytes": 715842,
+      "sha256": "95f1f488feaa1157fbbfceb86fbf2e9760b299dc345797d1f9a1bfd097827f27"
     },
     {
       "path": "assets/vendor/Material-Symbols-LICENSE.txt",
@@ -567,7 +567,7 @@
       "path": "assets/vendor/material-symbols.css",
       "bytes": 620,
       "originalBytes": 659,
-      "sha256": "2a079c164a9f766a062a9d03ad76363f92aa1509d7ffa15f4ef9658a05a94c99"
+      "sha256": "cdb4d42ff627e5919262d00daee350decfd609143ea75c428f7de8b782a0579e"
     },
     {
       "path": "assets/vendor/qrcode-generator/qrcode.js",
@@ -591,19 +591,19 @@
       "path": "public/index.html",
       "bytes": 154448,
       "originalBytes": 154158,
-      "sha256": "c152c5c3a4c33b5a966d97ae8b06286f408d65ede99cff8aaf2a0dfed4ef58ed"
+      "sha256": "eb59497cbcf406f30d7f894cff102309e433637f192b4e2b6a2c9926ee83fb34"
     },
     {
       "path": "public/CN.html",
       "bytes": 154448,
       "originalBytes": 154158,
-      "sha256": "c152c5c3a4c33b5a966d97ae8b06286f408d65ede99cff8aaf2a0dfed4ef58ed"
+      "sha256": "eb59497cbcf406f30d7f894cff102309e433637f192b4e2b6a2c9926ee83fb34"
     },
     {
       "path": "public/admin.html",
       "bytes": 87663,
       "originalBytes": 87605,
-      "sha256": "28a4d7c490575964e98782dd0d51eb926fd1b3e09b617cb91a131cca7c72cf85"
+      "sha256": "e5bb231fbf1381bdb36c5a573fcfb5cccb1a68665702195f094fd635a108c367"
     },
     {
       "path": "public/version-history-modal.html",
@@ -615,9 +615,9 @@
       "path": "public/sw.js",
       "bytes": 2087,
       "originalBytes": 2992,
-      "sha256": "69d6a0a336cbb37951c11ab4de0e859aba25e306502911ff03ce3c99169a5c77"
+      "sha256": "687edcae899c8d855f9c3177d24d5fd3f77429919aa4942f5a2950bbfd1c9ae5"
     }
   ],
-  "originalBytes": 5104635,
-  "publishedBytes": 4278865
+  "originalBytes": 5107513,
+  "publishedBytes": 4281377
 }
