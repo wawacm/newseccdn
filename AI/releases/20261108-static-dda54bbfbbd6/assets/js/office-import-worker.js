@@ -1,0 +1,1 @@
+self.onmessage=async event=>{const{buffer:buffer,moduleUrl:moduleUrl,options:options}=event.data;try{const parser=await(import(moduleUrl)),result=await parser.parse(buffer,{...options,progress:p=>self.postMessage({progress:p})});self.postMessage({result:result})}catch(error){self.postMessage({error:error?.message||"文档解析失败"})}};

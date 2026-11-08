@@ -1,0 +1,1 @@
+(()=>{"use strict";window.WawaRiskContext={get(){try{const timezone=Intl.DateTimeFormat().resolvedOptions().timeZone;if("string"==typeof timezone&&timezone)return{timezone:timezone}}catch(_){}return{}},headers(){const context=this.get();return context.timezone?{"X-Timezone":context.timezone}:{}}}})();
