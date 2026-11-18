@@ -1326,6 +1326,7 @@ function setupDelete() {
                             bootbox.alert($('<span>').text(message).html());
                         });
                     } else if (result) {
+                        if (window.VFMHarbor) window.VFMHarbor.loading('正在删除…');
                         window.location.href = dest;
                     }
                 }
@@ -1357,6 +1358,7 @@ function setupDelete() {
                             });
                             return;
                         }
+                        if (window.VFMHarbor) window.VFMHarbor.loading('正在删除…');
                         $.ajax({
                             type: "POST",
                             url: "vfm-admin/ajax/vfm-del.php",
@@ -1373,6 +1375,9 @@ function setupDelete() {
                         })
                         .fail(function(jqXHR, textStatus, errorThrown) {
                             $('.delresp').html( 'error connecting to vfm-del.php : ' + errorThrown );
+                        })
+                        .always(function() {
+                            if (window.VFMHarbor) window.VFMHarbor.loading();
                         });
                     }
                 }
