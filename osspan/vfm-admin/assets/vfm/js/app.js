@@ -3,89 +3,81 @@ var vfmmodals = JSON.parse(VFMmodals);
 var vfmvars = JSON.parse(VFMvars);
 
 var zoomviewEl = document.getElementById('zoomview');
-var modalzoomview = false;
+var modalzoomview = zoomviewEl ? new bootstrap.Modal(zoomviewEl) : null;
 var videojs;
-if (zoomviewEl) {
-    modalzoomview = new bootstrap.Modal(document.getElementById('zoomview'));
+
+function clearZoomMedia() {
+    if (videojs) {
+        videojs.destroy();
+        videojs = null;
+    }
+    $('#zoomview .vfm-zoom').empty();
 }
 
-function loadVid(thislink, thislinkencoded, thisname, thisID, ext){
-    
-    if (modalzoomview && vfmmodals.hasOwnProperty('zoomview')) {
-
-        if (ext == 'ogv') {
-            ext = 'ogg';
-        }
-        var vidlink = 'vfm-admin/ajax/streamvid.php?vid=' + thislink;
-        var playerhtml = '<video id="my-video" class="video-js vjs-16-9">' + '<source src="'+ vidlink +'" type="video/'+ ext +'">';
-        $(".vfm-zoom").html(playerhtml);
-
-        videojs = new Plyr(document.querySelector('#my-video'), {
-            // autoplay: true
-        });
-
-        // videojs('#my-video', { 
-        //     controls: true,
-        //     autoplay: true,
-        //     preload: 'auto',
-        //     // language: $("#zoomview").data('lang')
-        // }, function(){
-        //     // video initialized
-        // });
-
-        $("#zoomview .thumbtitle").val(thisname);
-        $("#zoomview").data('id', thisID);
-        // $("#zoomview").modal();
-        modalzoomview.show();
-
-        checkNextPrev(thisID);
-
-        $(".vfmlink").attr("href", vfmmodals.zoomview.baselink + thislinkencoded);
-    
-        if (vfmmodals.zoomview.directlink == true) {
-            $(".vfmlink").attr('target','_blank');
-            $("#zoomview .thumbtitle").val(vfmmodals.zoomview.script_url + b64DecodeUnicode(thislink));
+function showFilePreview(link, rowId) {
+    var $link = $(link);
+    var type = $link.data('type') || ($link.hasClass('vid') ? 'video' : 'image');
+    var source = $link.attr('data-preview');
+    var name = $link.attr('data-name');
+    var download = $link.attr('data-download');
+    var inline = Boolean(source);
+    if (!inline) {
+        var legacy = vfmmodals.zoomview;
+        var ref = $link.attr('data-link');
+        source = (type === 'video' ? 'vfm-admin/ajax/streamvid.php?vid=' : 'vfm-admin/include/vfm-thumb.php?y=1&thumb=') + encodeURIComponent(ref);
+        download = legacy.baselink + $link.attr('data-linkencoded');
+        if (legacy.directlink) {
+            name = legacy.script_url + b64DecodeUnicode(ref);
         }
     }
-}
 
-function loadImg(thislink, thislinkencoded, thisname, thisID, ext){
-
-    if (modalzoomview && vfmmodals.hasOwnProperty('zoomview')) {
-
-        $(".vfm-zoom").html('<div class="prezoomimg"><div class="position-absolute w-100 h-100 start-0 top-0 d-flex justify-content-center align-items-center"><div class="spinner-border" role="status"></div></div></div><img class="preimg" src="vfm-admin/include/vfm-thumb.php?thumb='+ thislink +'&y=1"/>');
-
-        $("#zoomview").data('id', thisID);
-        $("#zoomview .thumbtitle").val(thisname);
-        var firstImg = $('.preimg');
-        firstImg.css('display','none');
-
-        // $("#zoomview").modal();
-        modalzoomview.show();
-
-        firstImg.one('load', function() {
-            $(".vfm-zoom .prezoomimg").fadeOut();
-            $(this).fadeIn();
-            checkNextPrev(thisID);
-            $(".vfmlink").attr("href", vfmmodals.zoomview.baselink + thislinkencoded);
-
-            if (ext == 'pdf') {
-                $(".vfmlink").attr('target','_blank');
+    clearZoomMedia();
+    var $modal = $(zoomviewEl);
+    var box = $modal.find('.vfm-zoom').get(0);
+    var media;
+    switch (type) {
+        case 'video':
+        case 'audio':
+            media = document.createElement(type);
+            media.controls = true;
+            media.preload = 'metadata';
+            media.className = 'mw-100 w-100';
+            if (type === 'video') {
+                media.playsInline = true;
+                media.style.maxHeight = '75vh';
             }
-            if (vfmmodals.hasOwnProperty('zoomview')) {
-                if (vfmmodals.zoomview.directlink == true) {
-                    $(".vfmlink").attr('target','_blank');
-                    $("#zoomview .thumbtitle").val(vfmmodals.zoomview.script_url + b64DecodeUnicode(thislink));
-                }
-            }
-        }).each(function() {
-            if ($(this).hasOwnProperty('indexOf')){
-                if (this.complete) {
-                    $(this).load();
-                }
-            }
-        });
+            break;
+        case 'pdf':
+            media = document.createElement('iframe');
+            media.className = 'w-100 border-0';
+            media.title = name;
+            media.style.height = '75vh';
+            break;
+        default:
+            media = document.createElement('img');
+            media.className = 'preimg';
+            media.alt = name;
+            break;
     }
+
+    media.addEventListener('error', function () {
+        var error = document.createElement('p');
+        error.className = 'text-body-secondary py-4 mb-0';
+        error.textContent = '暂时无法预览，可使用左上角下载。';
+        media.replaceWith(error);
+    }, {once:true});
+
+    $modal.find('.thumbtitle').val(name);
+    $modal.find('a.vfmlink').attr('href', download)
+        .attr('target', !inline && (vfmmodals.zoomview.directlink || $link.data('ext') === 'pdf') ? '_blank' : null);
+
+    media.src = source;
+    box.append(media);
+    if (type === 'video' && typeof Plyr === 'function') {
+        videojs = new Plyr(media);
+    }
+    checkNextPrev(rowId);
+    modalzoomview.show();
 }
 
 // // Focus login form
@@ -129,145 +121,49 @@ function callClipboards(){
 }
 
 /**
- * Call vid preview 
+ * Use the same preview and gallery controls for native files and Harbor files.
  */
-$(document).on('click', 'a.vid', function(e) {
+$(document).on('click', 'a.vfm-gall, a.vid, a.thumb', function(e) {
+    if (!modalzoomview || !this.getAttribute('data-name') || e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) {
+        return;
+    }
     e.preventDefault();
-    $('.navigall').remove();
-    var thislink = $(this).data('link');
-    var thislinkencoded = $(this).data('linkencoded');
-    var thisname = $(this).data('name');
-    var thisID = $(this).parents('.rowa').attr('id');
-    var thisExt = $(this).data('ext').toLowerCase();
-    loadVid(thislink, thislinkencoded, thisname, thisID, thisExt);
+    showFilePreview(this, $(this).closest('.rowa').attr('id'));
 });
 
-/**
- * Call image preview 
- */
-$(document).on('click', 'a.thumb', function(e) {
-    e.preventDefault();
-    $('.navigall').remove();
-    var thislink = $(this).data('link');
-    var thislinkencoded = $(this).data('linkencoded');
-    var thisname = $(this).data('name');
-    var thisID = $(this).parents('.rowa').attr('id');
-    var thisExt = $(this).data('ext').toLowerCase();
-    loadImg(thislink, thislinkencoded, thisname, thisID, thisExt);
-});
-
-/**
- * Return first item from the end of the gallery
- */
-jQuery.fn.firstAfter = function(selector) {
-    return this.nextAll(selector).first();
-};
-jQuery.fn.firstBefore = function(selector) {
-    return this.prevAll(selector).first();
-};
-
-/**
- * Setup gallery navigation
- */
-function checkNextPrev(currentID){
-
-    var current = $('#'+currentID);
-    var nextgall = current.firstAfter('.gallindex').find('.vfm-gall');
-    var prevgall = current.firstBefore('.gallindex').find('.vfm-gall');
-
-    if (nextgall.length > 0){
-
-        var nextlink = nextgall.data('link');
-        var nextlinkencoded = nextgall.data('linkencoded');
-        var nextname = nextgall.data('name');
-        var nextID = current.firstAfter('.gallindex').attr('id');
-        var nextmedia =  nextgall.data('type');
-        var nextext = nextgall.data('ext');
-
-        if ($('.nextgall').length < 1) {
-            $('.vfm-zoom').append('<a class="nextgall navigall"><span><i class="bi bi-chevron-right text-white"></i></span></a>');
-        }
-        $('.nextgall').data('link', nextlink);
-        $('.nextgall').data('linkencoded', nextlinkencoded);
-        $('.nextgall').data('name', nextname);
-        $('.nextgall').data('id', nextID);
-        $('.nextgall').data('type', nextmedia);
-        $('.nextgall').data('ext', nextext);
-
-    } else {
-        $('.nextgall').remove();
-    }
-
-    if (prevgall.length > 0){
-
-        var prevlink = prevgall.data('link');  
-        var prevlinkencoded = prevgall.data('linkencoded');
-        var prevname = prevgall.data('name');
-        var prevID = current.firstBefore('.gallindex').attr('id');
-        var prevmedia = prevgall.data('type');
-        var prevext = prevgall.data('ext');
-
-        if ($('.prevgall').length < 1) {
-            $('.vfm-zoom').append('<a class="prevgall navigall"><span><i class="bi bi-chevron-left text-white"></i></span></a>');
-        }
-        $('.prevgall').data('link', prevlink);
-        $('.prevgall').data('linkencoded', prevlinkencoded);
-        $('.prevgall').data('name', prevname);
-        $('.prevgall').data('id', prevID);
-        $('.prevgall').data('type', prevmedia);
-        $('.prevgall').data('ext', prevext);
-
-    } else {
-        $('.prevgall').remove();
-    }
-}
-
-/**
- * navigate through image preview gallery
- */
-$(document).on('click', 'a.navigall', function(e) {
-    var thislink = $(this).data('link');
-    var thislinkencoded = $(this).data('linkencoded');
-    var thisname = $(this).data('name');
-    var thisID = $(this).data('id');
-    var mediatype = $(this).data('type');
-    var thisExt = $(this).data('ext');
-
-    $('.navigall').remove();
-
-    if ($( "#my-video" ).length) {
-        videojs.destroy();
-    }
-
-    if (mediatype == 'video') {
-        loadVid(thislink, thislinkencoded, thisname, thisID, thisExt);
-    } else {
-        loadImg(thislink, thislinkencoded, thisname, thisID);
-    }
-});
-
-/**
-* navigate with arrow keys
-*/
-$(document).keydown(function(e) {
-    if(e.keyCode == 39 && $('.nextgall').length > 0) { // right
-        $('.nextgall').trigger('click');
-    }
-
-    if(e.keyCode == 37 && $('.prevgall').length > 0) { // left
-        $('.prevgall').trigger('click');
-    }
-});
-
-$(document).ready(function(e) {
-    $('#zoomview').on('hidden.bs.modal', function () {
-        $('.navigall').remove();
-
-        if ($( "#my-video" ).length) {
-                videojs.destroy();
+function checkNextPrev(rowId) {
+    var row = rowId ? $(document.getElementById(rowId)) : $();
+    var groups = [
+        [row.prevAll('.gallindex').has('a.vfm-gall').first(), 'prevgall', 'left', '上一个'],
+        [row.nextAll('.gallindex').has('a.vfm-gall').first(), 'nextgall', 'right', '下一个']
+    ];
+    groups.forEach(function(group) {
+        var link = group[0].find('a.vfm-gall').get(0);
+        if (link) {
+            $('<a href="#" class="navigall"><span><i class="bi text-white"></i></span></a>')
+                .addClass(group[1]).attr('aria-label', group[3])
+                .find('i').addClass('bi-chevron-' + group[2]).end()
+                .on('click', function(event) {
+                    event.preventDefault();
+                    showFilePreview(link, group[0].attr('id'));
+                })
+                .appendTo('#zoomview .vfm-zoom');
         }
     });
+}
+
+$(document).keydown(function(e) {
+    if ($(e.target).closest('video, audio, input, iframe, .plyr').length) {
+        return;
+    }
+    if (e.key === 'ArrowRight') {
+        $('#zoomview .nextgall').trigger('click');
+    } else if (e.key === 'ArrowLeft') {
+        $('#zoomview .prevgall').trigger('click');
+    }
 });
+
+$('#zoomview').on('hidden.bs.modal', clearZoomMedia);
 
 /**
 * Rename file and folder 
@@ -660,7 +556,7 @@ function callTables(tablesettings, filetableconfig, foldertableconfig){
         // Add gallery class & ID to row with thumbs and videos
         createdRow : function ( row, data, index ) {
             $(row).addClass('rowa');
-            if ($(row).find('.thumb').length || $(row).find('.vid').length) {
+            if ($(row).find('.thumb').length || $(row).find('.vid').length || $(row).find('.vfm-gall').length) {
                 $(row).addClass('gallindex');
             }
         },
