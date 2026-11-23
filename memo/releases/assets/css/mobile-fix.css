@@ -1,0 +1,1 @@
+/* 禁止双击放大和手势缩放 */html,body{touch-action:manipulation;/* 禁用双击缩放 */-webkit-text-size-adjust:100%;/* 禁止字体自动调整 */overscroll-behavior-y:none/* 防止橡皮筋效果（可选） */}/* 针对移动端的输入框优化，防止聚焦时自动放大 */@media screen and (max-width: 768px){input,textarea,select,.ql-editor,.editor-content-new,.title-input{font-size:16px !important/* iOS下小于16px会触发自动放大 */}/* 强制禁止缩放 */*{touch-action:manipulation}}
