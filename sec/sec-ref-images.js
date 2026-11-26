@@ -187,8 +187,8 @@
     '<button type="button" class="refimg-lb-close" aria-label="关闭预览">' +
     '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M18 6 6 18M6 6l12 12"/></svg>' +
     '</button>' +
-    '<div class="refimg-lb-stage"><img class="refimg-lb-img" alt="本地参考图预览"></div>' +
-    '<div class="refimg-lb-bar"><span class="refimg-lb-info"></span><span class="refimg-lb-tag">仅本地预览 · 提交后安全直传</span></div>';
+    '<div class="refimg-lb-stage"><img class="refimg-lb-img" alt="参考图预览"></div>' +
+    '<div class="refimg-lb-bar"><span class="refimg-lb-info"></span><span class="refimg-lb-tag">最高级加密保存</span></div>';
   document.body.appendChild(lightbox);
 
   const lbImg = lightbox.querySelector('.refimg-lb-img');
@@ -198,10 +198,7 @@
   function openLightbox(item) {
     if (!item || !item.url) return;
     lbImg.src = item.url;
-    const ratio = item.origSize > item.compSize
-      ? ' · 压缩 ' + Math.round((1 - item.compSize / item.origSize) * 100) + '%'
-      : '';
-    lbInfo.textContent = `${item.width}×${item.height} · ${formatBytes(item.origSize)} → ${formatBytes(item.compSize)}${ratio}`;
+    lbInfo.textContent = `${item.width}×${item.height} · ${formatBytes(item.compSize)}`;
     lightbox.hidden = false;
     requestAnimationFrame(() => lightbox.classList.add('is-open'));
     lbClose.focus();
@@ -251,35 +248,24 @@
       card.dataset.id = String(item.id);
 
       if (item.loading) {
-        card.innerHTML = '<span class="refimg-spinner" aria-hidden="true"></span><span>压缩中…</span>';
+        card.innerHTML = '<span class="refimg-spinner" aria-hidden="true"></span><span>处理中…</span>';
       } else {
         const btn = document.createElement('button');
         btn.type = 'button';
         btn.className = 'refimg-thumb-btn';
-        btn.setAttribute('aria-label', '点击放大查看本地参考图');
+        btn.setAttribute('aria-label', '点击放大查看参考图');
         btn.addEventListener('click', () => openLightbox(item));
 
         const img = document.createElement('img');
         img.className = 'refimg-thumb';
         img.src = item.url;
-        img.alt = '参考图本地预览';
+        img.alt = '参考图预览';
         img.loading = 'lazy';
         btn.appendChild(img);
 
         const meta = document.createElement('span');
         meta.className = 'refimg-meta';
-        const savedPct = item.origSize > item.compSize
-          ? Math.round((1 - item.compSize / item.origSize) * 100)
-          : 0;
-        const sizeSpan = document.createElement('span');
-        sizeSpan.textContent = formatBytes(item.compSize);
-        meta.appendChild(sizeSpan);
-        if (savedPct >= 5) {
-          const saveSpan = document.createElement('span');
-          saveSpan.className = 'refimg-meta-save';
-          saveSpan.textContent = `-${savedPct}%`;
-          meta.appendChild(saveSpan);
-        }
+        meta.textContent = formatBytes(item.compSize);
         btn.appendChild(meta);
         card.appendChild(btn);
 
@@ -312,13 +298,8 @@
 
     if (footEl && statsEl) {
       if (readyItems.length > 0) {
-        const origTotal = readyItems.reduce((s, x) => s + x.origSize, 0);
         const compTotal = readyItems.reduce((s, x) => s + x.compSize, 0);
-        const pct = origTotal > compTotal ? Math.round((1 - compTotal / origTotal) * 100) : 0;
-        statsEl.innerHTML =
-          `已压缩 <strong>${formatBytes(compTotal)}</strong>` +
-          (pct >= 5 ? `<span class="refimg-saved-pill">省 ${pct}%</span>` : '') +
-          ' · 本地链接预览';
+        statsEl.innerHTML = `已添加 <strong>${readyItems.length}</strong> 张参考图 · ${formatBytes(compTotal)}`;
         footEl.hidden = false;
       } else {
         footEl.hidden = true;
@@ -518,3 +499,4 @@
 
   render();
 })();
+
